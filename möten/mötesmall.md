@@ -4,7 +4,8 @@
 3. Bordet runt
 4. Uppföljning av föregående möte
 5. Diskussion av nya punkter
-6. Mötet stängs
+6. Dagboksskribent
+7. Mötet stängs
 
 ## Närvarokontroll
 Idag närvarade
@@ -21,6 +22,9 @@ Här behandlas det "viktiga" med mötet, de nya grejerna. Görs med fördel i su
 
 ### följande,
 där man kan skriva intressanta saker om något nytt. Framförallt om vi som grupp bestämmer nått<>
+
+## Dagboksskribent
+Vem är dagboksskribent
 
 ## Mötet stängs
 Är ren formalia, men är alltid gött att få stänga ett möte (speciellt om det är långt!)
