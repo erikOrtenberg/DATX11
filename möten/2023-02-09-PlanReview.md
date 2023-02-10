@@ -8,7 +8,7 @@ Make a short introduction and make the background a bit more technical.
 
 Don't get to wrapped up in the technicalities so as to not lock ourselves in.
 
-Could make bullet points in objective that just lists our goals.
+~~Could make bullet points in objective that just lists our goals.~~
 
 Make concrete points of what we are going to do but should not be super specific.
 
