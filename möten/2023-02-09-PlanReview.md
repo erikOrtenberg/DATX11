@@ -6,11 +6,11 @@ Make a short introduction and make the background a bit more technical.
 ## Objective
 ~~instead of talking about training time it should be reduction in time of ML workloads.~~
 
-Don't get to wrapped up in the technicalities so as to not lock ourselves in.
+~~Don't get to wrapped up in the technicalities so as to not lock ourselves in.~~
 
 ~~Could make bullet points in objective that just lists our goals.~~
 
-Make concrete points of what we are going to do but should not be super specific.
+~~Make concrete points of what we are going to do but should not be super specific.~~
 
 ## Problem
 ~~Move the information from problem to background and have the more discussiony parts in problem.~~
