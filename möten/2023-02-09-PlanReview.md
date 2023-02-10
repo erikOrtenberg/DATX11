@@ -1,7 +1,7 @@
 ## Background
-Write about about energy efficieny and Dennard scaling.
+~~Write about about energy efficieny and Dennard scaling.~~
 
-Make a short introduction and make the background a bit more technical.
+~~Make a short introduction and make the background a bit more technical.~~
 
 ## Objective
 ~~instead of talking about training time it should be reduction in time of ML workloads.~~
