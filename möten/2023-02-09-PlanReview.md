@@ -30,7 +30,7 @@
 
 ~~Specify somewhere that we decided to make a VPU or make deciding part of the project.~~
 
-Could be possible to develop in C?
+~~Could be possible to develop in C?~~
 
 ~~Could pu comparison to baseline in a subsection here~~
 
