@@ -13,38 +13,38 @@ Could make bullet points in objective that just lists our goals.
 Make concrete points of what we are going to do but should not be super specific.
 
 ## Problem
-Move the information from problem to background and have the more discussiony parts in problem.
+~~Move the information from problem to background and have the more discussiony parts in problem. ~~
 
-SAs are not future proof but VPUs are more flexible as you can give it other instructions.
+~~SAs are not future proof but VPUs are more flexible as you can give it other instructions. ~~
 
-Move 'Comparison with baseline' to 'Methodology'.
+~~Move 'Comparison with baseline' to 'Methodology'.~~
 
-Move certain parts of 'Software' to 'Methodology', where we disicuss what we are going to do.
+~~Move certain parts of 'Software' to 'Methodology', where we disicuss what we are going to do.~~
 
 ## Scope
-~~If we are constrained to the size of the FPGA we can make a saclable version and implement a small one on FPGA and simulate a larger one.
+If we are constrained to the size of the FPGA we can make a saclable version and implement a small one on FPGA and simulate a larger one.
 
-~~Specify what we will not do due to existing constraints.
+Specify what we will not do due to existing constraints.
 
 ## Methodology
 
-Specify somewhere that we decided to make a VPU or make deciding part of the project.
+~~Specify somewhere that we decided to make a VPU or make deciding part of the project.~~
 
 Could be possible to develop in C?
 
-Could pu comparison to baseline in a subsection here
+~~Could pu comparison to baseline in a subsection here ~~
 
 ## Ethics
 
-~~By focusing on energy efficiency we can enter the field of environmental ethics where regardless of how people would use this tool it would have a positive effect as it would save electricity.
+By focusing on energy efficiency we can enter the field of environmental ethics where regardless of how people would use this tool it would have a positive effect as it would save electricity.
 
 ## Time plan
-~~Add a Gantt diagram
+Add a Gantt diagram
 
-~~Add hardware and software parts to demonstrate that things can be developed in parallel.
+Add hardware and software parts to demonstrate that things can be developed in parallel.
 
-~~Make a mock VPU for the hardware communication folk to develop toward and also work on the real VPU in parallel.
+Make a mock VPU for the hardware communication folk to develop toward and also work on the real VPU in parallel.
 
-~~Reencode the weeks to mortal weeks
+Reencode the weeks to mortal weeks
 
-~~Write what parts of the methodology will take place when
+Write what parts of the methodology will take place when
