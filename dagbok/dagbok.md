@@ -12,3 +12,9 @@ Vi hade veckoenligt möte på måndag och hade möte med handledaren på onsdag 
 ## Vecka 3
 
 Alla var på måndagsmöte utom Adam som var sjuk hela veckan. På mötet med handledaren blev gruppen övertalad att bygga VPU istället för SA. Mer efterforskningar och skrivning av projektplan tog plats.
+
+## Vecka 4
+
+Veckomöte på måndag alla närvarande. Har mest fokuserat på att skriva projektplan denna vecka. Sedan var det veckomöte med handledare på torsdag där vi kollade igenom projektplanen och fick lite feedback. Den blev klar i tid.
+
+
