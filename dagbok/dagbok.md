@@ -17,4 +17,6 @@ Alla var på måndagsmöte utom Adam som var sjuk hela veckan. På mötet med ha
 
 Veckomöte på måndag alla närvarande. Har mest fokuserat på att skriva projektplan denna vecka. Sedan var det veckomöte med handledare på torsdag där vi kollade igenom projektplanen och fick lite feedback. Den blev klar i tid.
 
+## Vecka 5
 
+Alla närvarade på veckomötet, Fredrik på distans. Vi har undersökt VPUer och försökt förbereda oss för planeringsmöte på nästa veckomöte. Laddar för att sätta igång med att utveckla första versionen av processorn. Dessutom har vi reviderat projektplanen utifrån kritik för projektplanens syfte. 
