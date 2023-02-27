@@ -1,3 +1,5 @@
 hardware/work/
 *.mpf
+*.mti
+*.wlf
 /hardware/transcript
