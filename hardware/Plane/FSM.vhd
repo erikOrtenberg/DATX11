@@ -11,17 +11,20 @@ entity plane_fsm is
          selected_element    :   out std_logic_vector (5 downto 0);
 
          clk                 :   in std_logic;
-         test                :   in std_logic);
+         test                :   in std_logic;
+         resetn              :   in std_logic);
 end plane_fsm;
 
 architecture test of plane_fsm is
     type state_type is (IDLE, RDA, RDB, RDC, EX, WB);
-    signal current_state : state_type := IDLE;
+    signal current_state : state_type;
 
 begin
     fsm : process(clk)
     begin
-        if(rising_edge(clk)) then
+        if resetn = '0' then
+            current_state <= IDLE;
+        elsif(rising_edge(clk)) then
             case current_state is
                 when IDLE => if test='1' then 
                         current_state <= RDA; 
