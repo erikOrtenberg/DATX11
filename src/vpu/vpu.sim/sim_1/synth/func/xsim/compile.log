@@ -1,5 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/fredrik/src/DATX11/src/vpu/vpu.sim/sim_1/synth/func/xsim/macc_tb_func_synth.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module macc32
-INFO: [VRFC 10-311] analyzing module glbl
-INFO: [VRFC 10-163] Analyzing VHDL file "/home/fredrik/src/DATX11/src/vpu/vpu.srcs/sim_1/new/macc_tb.vhd" into library xil_defaultlib
-INFO: [VRFC 10-3107] analyzing entity 'macc_tb'
