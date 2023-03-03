@@ -21,7 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use ieee.numeric_std;
+use ieee.numeric_std.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -34,24 +34,22 @@ use ieee.numeric_std;
 
 
 
-entity macc is
-    generic (ne : integer := 8; el: integer := 8);
-    port (a,b,c: in std_logic_vector(ne*el-1 downto 0);
-    r : out std_logic_vector(ne*el-1 downto 0));
-end macc;
+entity macc64 is
+    port (a,b,c: in std_logic_vector(63 downto 0);
+    r : out std_logic_vector(63 downto 0));
+end macc64;
 
 
-type iv is array(7 downto 0) of std_logic_vector(7 downto 0);
--- type t_word      is array (31 downto 0) of bit;
 
-
-architecture Behavioral of macc is
+architecture Behavioral of macc64 is
+    signal inter : signed(127 downto 0);
+    signal other: signed(63 downto 0);
     
-
     begin
-      G2: for i in 0 to el-1 generate
-          r(i) <= std_logic_vector(signed(a(i))*signed(b(i)) + signed(c(i)));
+      G2: for i in 1 to 8 generate
+      begin
+        inter(16*i-1 downto 16*(i-1)) <= signed(a(8*i-1 downto 8*(i-1)))*signed(b(8*i-1 downto 8*(i-1)));
+        other(8*i-1 downto 8*(i-1)) <= inter(16*i-8-1 downto 16*(i-1)) + signed(c(8*i-1 downto 8*(i-1)));
+        r <= std_logic_vector(other);
       END GENERATE G2; 
-    end
-    
  end Behavioral;
