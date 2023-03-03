@@ -20,3 +20,7 @@ Veckomöte på måndag alla närvarande. Har mest fokuserat på att skriva proje
 ## Vecka 5
 
 Alla närvarade på veckomötet, Fredrik på distans. Vi har undersökt VPUer och försökt förbereda oss för planeringsmöte på nästa veckomöte. Laddar för att sätta igång med att utveckla första versionen av processorn. Dessutom har vi reviderat projektplanen utifrån kritik för projektplanens syfte. 
+
+## Vecka 6
+
+Alla närvarade på veckomötet. På veckomötet har vi bestämt oss för en generell outline på VPUns v1. Många avgränsningar bestämdes för att göra v1 mer genomförbar, bland annat att processorns första version endast ska vara simulerbar. På tisdagen var det bibliotekshandledning, där vi gick igenom saker som var man kan hitta källor, alla närvarade. På tosdagen hade vi möte med handledaren, där vi presenterade vår plan för handledaren och fick feedback. Vissa försök gjordes även av gruppmedlemmarna att börja implementera delar av processorn, så som en multiplier i processorns framtida ALU.
