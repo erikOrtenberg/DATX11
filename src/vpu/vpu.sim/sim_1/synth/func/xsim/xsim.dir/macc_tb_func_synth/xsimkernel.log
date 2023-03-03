@@ -1,0 +1,7 @@
+Running: xsim.dir/macc_tb_func_synth/xsimk -simmode gui -wdb macc_tb_func_synth.wdb -simrunnum 0 -socket 44243
+Design successfully loaded
+Design Loading Memory Usage: 34376 KB (Peak: 34376 KB)
+Design Loading CPU Usage: 70 ms
+Simulation completed
+Simulation Memory Usage: 116240 KB (Peak: 173644 KB)
+Simulation CPU Usage: 370 ms
