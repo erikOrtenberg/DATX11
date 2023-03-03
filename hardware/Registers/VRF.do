@@ -10,4 +10,12 @@ run 20ns
 
 force writeEnable 0
 
+run 20ns
+
+force input         10#1230
+
+run 20ns
+
+force writeEnable 1
+
 run 100ns

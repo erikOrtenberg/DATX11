@@ -22,20 +22,8 @@ signal registerBankB : registerFile; --b191 - b128
 signal registerBankC : registerFile; --b127 - b64
 signal registerBankD : registerFile; --b63  - b0
 begin
-    init: process 
-    begin
-        for i in 0 to 3 loop
-            registerBankA(i) <= (others => '0');
-            registerBankB(i) <= (others => '0');
-            registerBankC(i) <= (others => '0');
-            registerBankD(i) <= (others => '0');
-        end loop;
-        wait;
-    end process;
     regFile: process(clk)
     begin
-        outA <= (others => '0');
-        outB <= (others => '0');
         if(rising_edge(clk)) then
             if(writeEnable = '1') then
                 registerBankA(to_integer(unsigned(writeRegSel))) <= input(255 downto 192);
