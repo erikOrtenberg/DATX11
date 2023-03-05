@@ -16,11 +16,11 @@ entity plane_fsm is
 end plane_fsm;
 
 architecture test of plane_fsm is
-    type state_type is (IDLE, RDA, RDB, RDC, EX, WB);
+    type state_type is (IDLE, RDA, RDB, RDC, EX, WB, MEM);
     signal current_state : state_type;
 
 begin
-    fsm : process(clk)
+    fsm : process(clk,resetn)  -- reset is asynchronized for now ig
     begin
         if resetn = '0' then
             current_state <= IDLE;
@@ -32,9 +32,10 @@ begin
                     end if;
                 when RDA  => current_state <= RDB;
                 when RDB  => current_state <= RDC;
-                when RDC  => current_state <= EX;
+                when RDC  => current_state <= EX;       --were we supposed to have an execute stage?
                 when EX   => current_state <= WB;
-                when WB   => if test='1' then 
+                when WB   => current_state <= MEM;
+                when MEM => if test='1' then 
                         current_state <= IDLE;
                     else current_state <= RDA; 
                     end if;
