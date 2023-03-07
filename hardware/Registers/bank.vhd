@@ -130,7 +130,7 @@ begin
                         null;
                     end case;
                     read_index <= std_logic_vector(unsigned(read_index) + 1);
-		end if;
+		        end if;
 
             -- Stream data out of bank every clock cycle until it reaches end (stalls if read_enable = 0)
             elsif (read_enable = '1' and read_streaming = '1') then
@@ -151,7 +151,15 @@ begin
                     when others =>
                     null;
                 end case;
-                read_index <= std_logic_vector(unsigned(read_index) + 1);
+
+                -- Checks if end of range
+                if (and_reduce(read_index) = '1') then
+                    read_index <= (others => '0');
+                    read_streaming <= '0';
+                else
+                    -- Increment index
+                    read_index <= std_logic_vector(unsigned(read_index) + 1);
+                end if;
             end if;
         end if;
     end process;
