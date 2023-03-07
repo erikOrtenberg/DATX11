@@ -7,8 +7,9 @@ entity bank is
 
     generic
     (
+        vector_length   : integer   := 64;
         bus_width       : integer   := 64;
-        index_length    : integer   := 8 -- NOTE: should be square root of vector length
+        index_length    : integer   := 8 -- NOTE: this should the square root of the vector length
     );
 
     port
@@ -39,7 +40,7 @@ end bank;
 
 architecture behavioral of bank is
 
-    type BANK_ARRAY_TYPE is ARRAY (0 to 2**index_length-1) of std_logic_vector(bus_width-1 downto 0);
+    type BANK_ARRAY_TYPE is ARRAY (0 to vector_length-1) of std_logic_vector(bus_width-1 downto 0);
 
     impure function init_bank_zeroes return BANK_ARRAY_TYPE is
         variable temp_array : BANK_ARRAY_TYPE;
