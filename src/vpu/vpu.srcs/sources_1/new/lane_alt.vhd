@@ -33,30 +33,30 @@ use IEEE.numeric_std.all;
 --  use UNISIM.VComponents.all;
 
 entity lane_alt is
-  Generic (op_size: integer  := 2;
-            Reg_addr_size : integer := 4;
-            Reg_index : integer := 3
+  Generic (op_size: integer  := 3;
+            Reg_addr_size : integer := 5;
+            Reg_index : integer := 4
   );
 
   Port (
     clk : in std_logic;
     resetn: in std_logic;
-    A,B,C: in std_logic_vector(63 DOWNTO 0);
-    N_OPS: in std_logic_vector(3 downto 0);
-    OP: in std_logic_vector(op_size -1 DOWNTO 0);
-    REG_ADDR: in std_logic_vector(3*Reg_addr_size -1 downto 0);
-    REG_ADDR_OUT: out std_logic_vector(Reg_addr_size -1 downto 0);
-    R: out std_logic_vector(63 DOWNTO 0);
+    A,B,C: in std_logic_vector(64 DOWNTO 0);
+    N_OPS: in std_logic_vector(4 downto 0);
+    OP: in std_logic_vector(op_size 0 DOWNTO 0);
+    REG_ADDR: in std_logic_vector(4*Reg_addr_size -1 downto 0);
+    REG_ADDR_OUT: out std_logic_vector(Reg_addr_size 0 downto 0);
+    R: out std_logic_vector(64 DOWNTO 0);
     DONE: out std_logic
   );
 end lane_alt;
 
 architecture Behavioral of lane_alt is
-signal iters : unsigned(3 downto 0);
+signal iters : unsigned(4 downto 0);
 type state is (Ni, Ex);
 signal current_state: state;
-signal alu_op: std_logic_vector(1 downto 0);
-signal A_buf, B_buf, C_buf, R_buf : std_logic_vector(63 downto 0);
+signal alu_op: std_logic_vector(2 downto 0);
+signal A_buf, B_buf, C_buf, R_buf : std_logic_vector(64 downto 0);
  
 
 

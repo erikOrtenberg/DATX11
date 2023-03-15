@@ -8,9 +8,9 @@ entity FA is
     );
 end FA;
 
-architecture test of FA is
+architecture v1 of FA is
 
 begin
     r     <= a xor b xor c_in;
     c_out <=  ((a xor b) and c_in) or (a and b);
-end test;
+end v1;

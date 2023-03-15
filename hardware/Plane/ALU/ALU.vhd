@@ -14,7 +14,7 @@ entity ALU is
   );
 end ALU;
 
-architecture arch of ALU is
+architecture v1 of ALU is
 component macc64 is
     port (a,b,c: in std_logic_vector(63 downto 0);
     r : out std_logic_vector(63 downto 0));
@@ -47,8 +47,8 @@ begin
     div: div64 port map(A,B,RDIV);
     
     with OP select R <=
-    RADD WHEN "10",
-    RDIV WHEN "11", 
+      RADD WHEN "10",
+      RDIV WHEN "11", 
     RMAC WHEN OTHERS;
 
 end architecture ; -- arch
