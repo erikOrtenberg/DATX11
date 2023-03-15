@@ -24,3 +24,9 @@ Alla närvarade på veckomötet, Fredrik på distans. Vi har undersökt VPUer oc
 ## Vecka 6
 
 Alla närvarade på veckomötet. På veckomötet har vi bestämt oss för en generell outline på VPUns v1. Många avgränsningar bestämdes för att göra v1 mer genomförbar, bland annat att processorns första version endast ska vara simulerbar. På tisdagen var det bibliotekshandledning, där vi gick igenom saker som var man kan hitta källor, alla närvarade. På tosdagen hade vi möte med handledaren, där vi presenterade vår plan för handledaren och fick feedback. Vissa försök gjordes även av gruppmedlemmarna att börja implementera delar av processorn, så som en multiplier i processorns framtida ALU.
+
+## Vecka 7
+
+Samtliga gruppmedlemmar närvarade på veckomötet. Avgränsningar av designen diskuterades, samt hur lanen ska se ut. Det beslutades att initiala prototypens omfattning fortfarande var för stor. Under veckan började Adam
+utveckling av ALU'n. Erik tog fram kodskelett för lanen's tillståndsmaskin. Sofia var sjuk men började med
+en fifobuffer och minne. Fredrik arbetade med maccenhet samt testbänkar. Johannes arbetade med halvtidsredovisningen.
