@@ -15,7 +15,7 @@ entity register_file is
     (outA               : out std_logic_vector(bus_length - 1 downto 0);                    -- Output signals for selected registers 
      outB               : out std_logic_vector(bus_length - 1 downto 0);
      outC               : out std_logic_vector(bus_length - 1 downto 0);
-     input              : in  std_logic_vector(bus_length - 1 downto 0);                    -- Input value to one register of one vector 
+     dataIn             : in  std_logic_vector(bus_length - 1 downto 0);                    -- Input value to one register of one vector 
      writeEnable        : in std_logic;                                                     -- Enables writing the input to selected register and vector
      regASel            : in std_logic_vector(nr_of_vectors - 1 downto 0);                  -- Select which vector registers to output 
      regBSel            : in std_logic_vector(nr_of_vectors - 1 downto 0);
@@ -46,7 +46,7 @@ begin
             end if;
             if(falling_edge(clk)) then
                 if(writeEnable = '1') then
-                    registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= input;
+                    registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= dataIn;
                 end if;
             end if;
         end if;
