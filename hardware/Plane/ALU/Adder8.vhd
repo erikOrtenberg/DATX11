@@ -9,12 +9,15 @@ entity Adder8 is
     c_out : out std_logic);
 end Adder8 ;
 
-architecture bhv of Adder8 is
+architecture Adder8_arch of Adder8 is
 
 component FA
   port ( 
-  FAa, FAb, FAc_in : in std_logic;
-  FAs, FAc_out : out std_logic);
+  a : in std_logic;
+  b : in std_logic;
+  cin : in std_logic;
+  r : out std_logic;
+  cout : out std_logic);
 end component;
 
 signal carries : std_logic_vector (8 downto 0);
