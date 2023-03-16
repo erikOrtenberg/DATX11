@@ -30,3 +30,7 @@ Alla närvarade på veckomötet. På veckomötet har vi bestämt oss för en gen
 Samtliga gruppmedlemmar närvarade på veckomötet. Avgränsningar av designen diskuterades, samt hur lanen ska se ut. Det beslutades att initiala prototypens omfattning fortfarande var för stor. Under veckan började Adam
 utveckling av ALU'n. Erik tog fram kodskelett för lanen's tillståndsmaskin. Sofia var sjuk men började med
 en fifobuffer och minne. Fredrik arbetade med maccenhet samt testbänkar. Johannes arbetade med halvtidsredovisningen.
+
+## Vecka 8
+
+Samtiliga medlemmar närvarande på veckomötet. Vi diskuterade om implementationen av VRFen och ändrade designen en del. Vi vidareutvecklade på detta under veckan. Vi även började testa existerande komponenter som maccen och buffern. På torsdagen förberedde vi oss för fackspråksmötet/opponeringen som vi sen hade på fredagen. På mötet fick vi en kritik för vår rapport. Till sist gjorde vi alla enskilt egen-utvärderingen. 
