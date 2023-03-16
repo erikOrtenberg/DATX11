@@ -30,7 +30,7 @@ carries(0) <= c_in;
 G1 : for i in 0 to 7 generate
   FA1: FA port map(a => a(i), b => b(i), c_in => carries(i), r => r(i), c_out => carries(i+1));
 end generate;
-res <= result;
+-- res <= result;
 c_out <= carries(8);
 
 end architecture; -- arch
