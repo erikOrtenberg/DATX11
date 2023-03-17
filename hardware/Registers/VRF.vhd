@@ -5,30 +5,30 @@ use ieee.numeric_std.all;
 
 
 entity register_file is   
-    generic
-    (
+    generic(
         vector_length   : integer   := 256;
-        bus_length      : integer   := 64;
-        nr_of_vectors   : integer   := 32
+        bus_width      : integer   := 64;
+        nr_of_vectors   : integer   := 32;
+        nr_of_addr_bits : integer   := 5
     );
-    port
-    (outA               : out std_logic_vector(bus_length - 1 downto 0);                    -- Output signals for selected registers 
-     outB               : out std_logic_vector(bus_length - 1 downto 0);
-     outC               : out std_logic_vector(bus_length - 1 downto 0);
-     dataIn             : in  std_logic_vector(bus_length - 1 downto 0);                    -- Input value to one register of one vector 
-     writeEnable        : in std_logic;                                                     -- Enables writing the input to selected register and vector
-     regASel            : in std_logic_vector(nr_of_vectors - 1 downto 0);                  -- Select which vector registers to output 
-     regBSel            : in std_logic_vector(nr_of_vectors - 1 downto 0);
-     regCSel            : in std_logic_vector(nr_of_vectors - 1 downto 0);                  -- (Also the input vector register)
-     writeRegSel        : in std_logic_vector(vector_length / bus_length - 1 downto 0);     -- Select register inside vector to write to
-     readRegSel         : in std_logic_vector(vector_length / bus_length - 1 downto 0);     -- Select which register to read from (in A,B and C)
-     clk                : in std_logic;
-     resetn             : in std_logic                                                      -- Active low
+    port(
+        outA               : out std_logic_vector(bus_width - 1 downto 0);                    -- Output signals for selected registers 
+        outB               : out std_logic_vector(bus_width - 1 downto 0);
+        outC               : out std_logic_vector(bus_width - 1 downto 0);
+        dataIn             : in std_logic_vector(bus_width - 1 downto 0);                    -- Input value to one register of one vector 
+        writeEnable        : in std_logic;                                                     -- Enables writing the input to selected register and vector
+        regASel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);                  -- Select which vector registers to output 
+        regBSel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);
+        regCSel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);                  -- (Also the input vector register)
+        writeRegSel        : in std_logic_vector(vector_length / bus_width - 1 downto 0);     -- Select register inside vector to write to
+        readRegSel         : in std_logic_vector(vector_length / bus_width - 1 downto 0);     -- Select which register to read from (in A,B and C)
+        clk                : in std_logic;
+        resetn             : in std_logic                                                      -- Active low
     );
 end register_file;
 
 architecture v1 of register_file is
-type vector_register is array(0 to vector_length / bus_length - 1) of std_logic_vector(bus_length - 1 downto 0);
+type vector_register is array(0 to vector_length / bus_width - 1) of std_logic_vector(bus_width - 1 downto 0);
 type registerFile is array(0 to nr_of_vectors - 1) of vector_register;
 
 signal registers : registerFile;
