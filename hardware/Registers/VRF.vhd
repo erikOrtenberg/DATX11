@@ -20,8 +20,8 @@ entity register_file is
         regASel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);                  -- Select which vector registers to output 
         regBSel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);
         regCSel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);                  -- (Also the input vector register)
-        writeRegSel        : in std_logic_vector(vector_length / bus_width - 1 downto 0);     -- Select register inside vector to write to
-        readRegSel         : in std_logic_vector(vector_length / bus_width - 1 downto 0);     -- Select which register to read from (in A,B and C)
+        writeRegSel        : in std_logic_vector(1 downto 0);     -- Select register inside vector to write to
+        readRegSel         : in std_logic_vector(1 downto 0);     -- Select which register to read from (in A,B and C)
         clk                : in std_logic;
         resetn             : in std_logic                                                      -- Active low
     );

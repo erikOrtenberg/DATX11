@@ -43,7 +43,7 @@ signal R_OUT: signed(63 downto 0);
 
 begin
 sums: for i in 1 to 8 GENERATE
-    R_OUT(8*i-1 DOWNTO 8*(i-1)) <= signed(A(8*(i-1) DOWNTO 8*(i-1))) + signed(B(8*(i-1) DOWNTO 8*(i-1)));
+    R_OUT(8*i-1 DOWNTO 8*(i-1)) <= signed(A(8*i-1 DOWNTO 8*(i-1))) + signed(B(8*i-1 DOWNTO 8*(i-1)));
     R <= STD_LOGIC_VECTOR(R_OUT);
     end GENERATE sums;
 

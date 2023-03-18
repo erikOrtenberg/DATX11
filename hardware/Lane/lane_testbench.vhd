@@ -31,6 +31,6 @@ begin
     clk <= not clk after 10 ns;
     resetn <= '0', '1' after 40 ns;
 
-    control_signal <= (others => '0');
+    control_signal <= "10101010101010001011010011010111";
 
 end test; 

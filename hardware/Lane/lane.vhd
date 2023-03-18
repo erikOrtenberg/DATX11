@@ -7,7 +7,8 @@ entity lane is
         bus_width           : integer := 64;
         nr_of_reg_addr_bits : integer := 5;
         nr_of_vectors       : integer := 32;
-        op_length           : integer := 32
+        op_length           : integer := 32;
+        alu_op_length       : integer := 2
     );
     port(
         clk                 : in std_logic;
@@ -30,11 +31,11 @@ architecture v1 of lane is
     signal regASel,regBSel,regCSel  : std_logic_vector(nr_of_reg_addr_bits - 1 downto 0);
     signal ALU_OP                   : std_logic_vector(1 downto 0);
     
-    signal readRegSel, writeRegSel  : std_logic_vector(VLEN / bus_width - 1 downto 0);
+    signal readRegSel, writeRegSel  : std_logic_vector(1 downto 0);
 
     -- Controller signals
 
-    signal regIndex                 : std_logic_vector(1 downto 0);
+    --signal regIndex                 : std_logic_vector(1 downto 0);
     signal regRead                  : std_logic;    -- currently unused
     signal regWrite                 : std_logic;
     signal awaitingNewInstr         : std_logic;
@@ -48,19 +49,22 @@ begin
     ctrl : entity work.control_unit_lane(v1)
         generic map (
             NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
-            OP_LENGTH       => op_length
+            OP_LENGTH       => op_length,
+            ALU_OP_LENGTH   => alu_op_length
         )
         port map(
-            clk => clk, 
-            resetn => resetn,
-            OP => control_signal,
-            REG_A => regASel,
-            REG_B => regBSel,
-            REG_C => regCSel,
-            REG_IDX => regIndex,
-            REGR => regRead,
-            REGW => regWrite,
-            DONE => awaitingNewInstr
+            clk         => clk, 
+            resetn      => resetn,
+            OP          => control_signal,
+            REG_A       => regASel,
+            REG_B       => regBSel,
+            REG_C       => regCSel,
+            REGR_IDX    => readRegSel,
+            REGW_IDX    => writeRegSel,
+            REGR        => regRead,
+            REGW        => regWrite,
+            ALU_OP      => ALU_OP,
+            DONE        => awaitingNewInstr
         );
 
     reg : entity work.register_file(v1) 
@@ -71,16 +75,16 @@ begin
             nr_of_addr_bits => nr_of_reg_addr_bits
         )
         port map(
-            clk => clk, 
-            resetn => resetn,
-            outA => A, 
-            outB => B, 
-            outC => C, 
-            dataIn => write_data,
-            regASel => regASel, 
-            regBSel => regBSel, 
-            regCSel => regCSel,
-            readRegSel => readRegSel,
+            clk         => clk, 
+            resetn      => resetn,
+            outA        => A, 
+            outB        => B, 
+            outC        => C, 
+            dataIn      => write_data,
+            regASel     => regASel, 
+            regBSel     => regBSel, 
+            regCSel     => regCSel,
+            readRegSel  => readRegSel,
             writeRegSel => writeRegSel,
             writeEnable => regWrite
         );
