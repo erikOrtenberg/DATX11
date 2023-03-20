@@ -14,6 +14,8 @@ ENTITY control_unit_lane IS
 
         OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
+        V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
+        X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
         REGR_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGW_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGR,REGW               : OUT STD_LOGIC;
@@ -82,7 +84,7 @@ begin
         "10" when EX3,
         "11" when others;  
 
-    with state select REGR_IDX <=
+    with state select REGW_IDX <=
         "00" when EX2,
         "01" when EX3,
         "10" when EX4,
@@ -102,62 +104,86 @@ begin
         "11" when ST_FP,
         "01" when others;
 
-    reg_select: process(op_type, clk)
+    reg_select: process(op_type, clk, resetn)
     begin
-        case op_type is
-            when OP_VEC =>
-                --REG_A <= op_v_signal.field2;
-                --REG_B <= op_v_signal.field3;
-                --REG_C <= op_v_signal.field1;
-                case op_v_signal.funct3 is
-                    when "000"  => op_cat <= OPIVV;
-                    when "001"  => op_cat <= OPFVV;
-                    when "010"  => op_cat <= OPMVV;
-                    when "011"  => op_cat <= OPIVI;
-                    when "100"  => op_cat <= OPIVX;
-                    when "101"  => op_cat <= OPFVF;
-                    when "110"  => op_cat <= OPMVX;
-                    when "111"  => op_cat <= OPCFG;
-                    when others => null;
-                end case;   
-                    
-            when LD_FP =>
-                --REG_A <= ld_st_signal.field2;
-                --REG_B <= ld_st_signal.field3;
-                --REG_C <= ld_st_signal.field1;
-                case ld_st_signal.mop is
-                    when "00"   => op_cat <= VL_unit_stride;
-                    when "10"   => op_cat <= VLS_strided;
-                    when others => op_cat <= VLX_indexed;
-                end case;
-            when ST_FP =>
-                --REG_A <= ld_st_signal.field2;
-                --REG_B <= ld_st_signal.field3;
-                --REG_C <= ld_st_signal.field1;
-                case ld_st_signal.mop is
-                    when "00"   => op_cat <= VS_unit_stride;
-                    when "10"   => op_cat <= VSS_strided;
-                    when others => op_cat <= VSX_indexed;
-                end case;
-        end case;
+        if(resetn = '0') then 
+            advance <= '0';
+        else 
+            advance <= '1';
+            case op_type is
+                when OP_VEC =>
+                    case op_v_signal.funct3 is
+                        when "000"  => op_cat <= OPIVV;
+                        when "001"  => op_cat <= OPFVV;
+                        when "010"  => op_cat <= OPMVV;
+                        when "011"  => op_cat <= OPIVI;
+                        when "100"  => op_cat <= OPIVX;
+                        when "101"  => op_cat <= OPFVF;
+                        when "110"  => op_cat <= OPMVX;
+                        when "111"  => op_cat <= OPCFG;
+                        when others => null;
+                    end case;   
+                        
+                when LD_FP =>
+                    case ld_st_signal.mop is
+                        when "00"   => op_cat <= VL_unit_stride;
+                        when "10"   => op_cat <= VLS_strided;
+                        when others => op_cat <= VLX_indexed;
+                    end case;
+                when ST_FP =>
+                    case ld_st_signal.mop is
+                        when "00"   => op_cat <= VS_unit_stride;
+                        when "10"   => op_cat <= VSS_strided;
+                        when others => op_cat <= VSX_indexed;
+                    end case;
+            end case;
 
-        case op_cat is
-            
-            when VL_unit_stride => null; -- Todo
-            when VLS_strided => null;
-            when VLX_indexed => null;
-            when VS_unit_stride => null; -- Todo
-            when VSS_strided => null;
-            when VSX_indexed => null;
-            when OPIVV => null; -- Todo
-            when OPFVV => null; -- not doing this
-            when OPMVV => null;
-            when OPIVI => null;
-            when OPIVX => null;
-            when OPFVF => null; -- not doing this
-            when OPMVX => null;
-            when OPCFG => null;
-        end case;
+            V_USE_A <= '0';
+            V_USE_B <= '0';
+            V_USE_C <= '0';
+            X_USE_A <= '0';
+            X_USE_B <= '0';
+            X_USE_C <= '0';
+
+            case op_cat is
+                -- macc funct6 = "101101"
+                when VL_unit_stride => null; -- Todo
+                --when VLS_strided => null; -- not doing this
+                --when VLX_indexed => null; -- not doing this
+                when VS_unit_stride => null; -- Todo
+                --when VSS_strided => null; -- not doing this 
+                --when VSX_indexed => null; -- not doing this
+                --when OPIVV | OPIVX | OPIVI => null; 
+                --when OPFVV | OPFVF => null; -- not doing this
+                when OPMVV | OPMVX =>
+
+                    -- Register setup
+
+                    REG_A <= op_v_signal.field2;
+                    REG_B <= op_v_signal.field3;
+                    REG_C <= op_v_signal.field1;
+                    V_USE_B <= '1'; -- B is always a vector
+                
+                    if(op_cat = OPMVV) then
+                        V_USE_A <= '1'; -- A depends on category
+                    else
+                        X_USE_A <= '1';
+                    end if;
+
+                    -- C depends on instruction
+
+                    -- Operation handling
+
+                    case op_v_signal.funct6 is
+                        when "101101" => -- MACC
+                            ALU_OP <= "01"; -- ALU MACC op
+                            V_USE_C <= '1'; -- C is a vector
+                        when others => null; 
+                    end case;
+                when OPCFG => null; -- Todo
+                when others => null;
+            end case;
+        end if;
     end process; 
     
 

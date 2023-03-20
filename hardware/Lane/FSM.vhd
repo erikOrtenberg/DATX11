@@ -16,13 +16,15 @@ architecture v1 of lane_fsm is
     signal current_state : lane_state_type;
     
     begin
+    
+    state <= current_state;
     fsm : process(clk,resetn)  -- reset is asynchronized for now ig
     begin
         if resetn = '0' then
             current_state <= INSTR;
         elsif(rising_edge(clk)) then
             case current_state is
-                when INSTR => if advance ='1' then 
+                when INSTR => if advance = '1' then 
                         current_state <= EX1; 
                     else current_state <= INSTR; 
                     end if;
