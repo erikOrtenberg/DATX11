@@ -44,6 +44,8 @@ signal ld_st_signal : LOAD_STORE_FP;
 
 signal op_type      : OP_CODE;
 
+signal op_cat       : OP_CATEGORY; 
+
 begin
     
     op_v_signal <= (
@@ -51,7 +53,7 @@ begin
         vm      => op(25),
         field3  => op(24 downto 20),
         field2  => op(19 downto 15),
-        op_code => op(14 downto 12),
+        funct3  => op(14 downto 12),
         field1  => op(11 downto 7)
     );
     
@@ -100,19 +102,61 @@ begin
         "11" when ST_FP,
         "01" when others;
 
-    reg_select: process(op_type)
+    reg_select: process(op_type, clk)
     begin
         case op_type is
             when OP_VEC =>
-                REG_A <= op_v_signal.field2;
-                REG_B <= op_v_signal.field3;
-                REG_C <= op_v_signal.field1;
-            when LD_FP | ST_FP =>
-                REG_A <= ld_st_signal.field2;
-                REG_B <= ld_st_signal.field3;
-                REG_C <= ld_st_signal.field1;
+                --REG_A <= op_v_signal.field2;
+                --REG_B <= op_v_signal.field3;
+                --REG_C <= op_v_signal.field1;
+                case op_v_signal.funct3 is
+                    when "000"  => op_cat <= OPIVV;
+                    when "001"  => op_cat <= OPFVV;
+                    when "010"  => op_cat <= OPMVV;
+                    when "011"  => op_cat <= OPIVI;
+                    when "100"  => op_cat <= OPIVX;
+                    when "101"  => op_cat <= OPFVF;
+                    when "110"  => op_cat <= OPMVX;
+                    when "111"  => op_cat <= OPCFG;
+                    when others => null;
+                end case;   
+                    
+            when LD_FP =>
+                --REG_A <= ld_st_signal.field2;
+                --REG_B <= ld_st_signal.field3;
+                --REG_C <= ld_st_signal.field1;
+                case ld_st_signal.mop is
+                    when "00"   => op_cat <= VL_unit_stride;
+                    when "10"   => op_cat <= VLS_strided;
+                    when others => op_cat <= VLX_indexed;
+                end case;
+            when ST_FP =>
+                --REG_A <= ld_st_signal.field2;
+                --REG_B <= ld_st_signal.field3;
+                --REG_C <= ld_st_signal.field1;
+                case ld_st_signal.mop is
+                    when "00"   => op_cat <= VS_unit_stride;
+                    when "10"   => op_cat <= VSS_strided;
+                    when others => op_cat <= VSX_indexed;
+                end case;
+        end case;
 
-
+        case op_cat is
+            
+            when VL_unit_stride => null; -- Todo
+            when VLS_strided => null;
+            when VLX_indexed => null;
+            when VS_unit_stride => null; -- Todo
+            when VSS_strided => null;
+            when VSX_indexed => null;
+            when OPIVV => null; -- Todo
+            when OPFVV => null; -- not doing this
+            when OPMVV => null;
+            when OPIVI => null;
+            when OPIVX => null;
+            when OPFVF => null; -- not doing this
+            when OPMVX => null;
+            when OPCFG => null;
         end case;
     end process; 
     

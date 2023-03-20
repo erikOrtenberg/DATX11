@@ -15,7 +15,7 @@ package Common_pkg is    -- untested...
         vm          : std_logic;
         field3      : std_logic_vector(4 downto 0);
         field2      : std_logic_vector(4 downto 0);
-        width      : std_logic_vector(2 downto 0);
+        width       : std_logic_vector(2 downto 0);
         field1      : std_logic_vector(4 downto 0);
     end record LOAD_STORE_FP;
     
@@ -24,9 +24,26 @@ package Common_pkg is    -- untested...
         vm          : std_logic;
         field3      : std_logic_vector(4 downto 0);
         field2      : std_logic_vector(4 downto 0);
-        op_code     : std_logic_vector(2 downto 0);
+        funct3      : std_logic_vector(2 downto 0);
         field1      : std_logic_vector(4 downto 0);
     end record OP_V;
+
+    type op_category is (
+        VL_unit_stride, 
+        VLS_strided, 
+        VLX_indexed, 
+        VS_unit_stride, 
+        VSS_strided, 
+        VSX_indexed, 
+        OPIVV, 
+        OPFVV, 
+        OPMVV, 
+        OPIVI, 
+        OPIVX, 
+        OPFVF, 
+        OPMVX,
+        OPCFG);
+
 
    -- (optional) useful tools
    --function to_slv (e : my_enum_type) return std_logic_vector;
