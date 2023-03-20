@@ -16,6 +16,7 @@ ENTITY control_unit_lane IS
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
+        -- Add write enable signals to block when reading/writing to memory
         REGR_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGW_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGR,REGW               : OUT STD_LOGIC;
