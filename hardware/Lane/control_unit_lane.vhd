@@ -91,18 +91,12 @@ begin
         "11" when others;  
     
     with state select REGR <=
-        '0' when INSTR,
+        '0' when EX5 | INSTR,
         '1' when others;
 
     with state select REGW <=
         '0' when INSTR | EX1,
         '1' when others;
-
-    with op_type select ALU_OP <=
-        "00" when OP_VEC,
-        "10" when LD_FP,
-        "11" when ST_FP,
-        "01" when others;
 
     reg_select: process(op_type, clk, resetn)
     begin
