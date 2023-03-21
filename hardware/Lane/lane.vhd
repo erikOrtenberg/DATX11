@@ -44,8 +44,15 @@ architecture v1 of lane is
 
     -- Memory signals
 
-    signal mem_data                 : std_logic_vector(bus_width - 1 downto 0);
+    signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
+    signal mem_read,mem_write       : std_logic;
+    signal mem_addr                 : std_logic_vector(bus_width - 1 downto 0);
 
+    -- Scalar register signals
+
+    signal x_data_in,x_data_out     : std_logic_vector(bus_width - 1 downto 0);
+    signal x_writeEnable            : std_logic;
+    signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
     ctrl : entity work.control_unit_lane(v1)
@@ -67,6 +74,8 @@ begin
             X_USE_A     => x_use_a,
             X_USE_B     => x_use_b,
             X_USE_C     => x_use_c,
+            MEM_READ    => mem_read,
+            MEM_WRITE   => mem_write,
             REGR_IDX    => readRegSel,
             REGW_IDX    => writeRegSel,
             REGR        => regRead,
@@ -75,7 +84,36 @@ begin
             DONE        => awaitingNewInstr
         );
 
-    reg : entity work.register_file(v1) 
+    mem : entity work.dummy_mem(v1)
+        port map(
+            clk         => clk,
+            m_read      => mem_read,
+            m_write     => mem_write,
+            m_addr      => mem_addr,
+            data_in     => mem_data_in,
+            data_out    => mem_data_out
+        );
+
+    -- Shouldn't be in the VPU
+    xreg : entity work.x_register_file(v1)
+        port map(
+            clk             => clk,
+            resetn          => resetn,
+            outA            => A, 
+            outB            => B, 
+            outC            => C,
+            outA_OE         => x_use_a, 
+            outB_OE         => x_use_b, 
+            outC_OE         => x_use_c, 
+            data_in         => x_data_in,
+            regASel         => regASel, 
+            regBSel         => regBSel, 
+            regCSel         => regCSel,
+            writeRegSel     => x_writeRegSel,
+            writeEnable     => x_writeEnable
+        );
+
+    vreg : entity work.v_register_file(v1) 
         generic map(
             vector_length   => VLEN,
             bus_width       => bus_width,
@@ -109,9 +147,10 @@ begin
             op=>ALU_OP
         );
 
-    wb_register <= R;   --hmm dont think this is correct 
+    with is_mem select wb_register <=
+        R when '0',
+        mem_data_out when others;
 
-    --write_data <= wb_register when is_mem = '1' else mem_data;    
 
     
 --lol fix things

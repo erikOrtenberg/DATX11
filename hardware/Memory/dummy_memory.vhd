@@ -6,8 +6,8 @@ use std.textio.all;
 -- primitive memory that one can load from and read
 entity dummy_mem is 
     generic(
-        data_w : integer;   --data width 
-        addr_w : integer   --addr width
+        data_w : integer := 64;   --data width 
+        addr_w : integer := 32   --addr width
         );
     port (
         clk : in std_logic;
@@ -19,7 +19,7 @@ entity dummy_mem is
         );
 end dummy_mem;
 
-architecture impl of dummy_mem is 
+architecture v1 of dummy_mem is 
     type mem_array is array (0 to (2**(addr_w))-1) 
         of std_logic_vector(data_w-1 downto 0);
 
@@ -39,6 +39,6 @@ architecture impl of dummy_mem is
             if m_read = '1' then data_out <= m_array(to_integer(unsigned(m_addr))); end if;
         end process;
 
-end impl;
+end v1;
 
 

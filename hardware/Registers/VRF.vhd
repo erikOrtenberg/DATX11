@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 
 
-entity register_file is   
+entity v_register_file is   
     generic(
         vector_length   : integer   := 256;
         bus_width      : integer   := 64;
@@ -28,9 +28,9 @@ entity register_file is
         clk                : in std_logic;
         resetn             : in std_logic                                                      -- Active low
     );
-end register_file;
+end v_register_file;
 
-architecture v1 of register_file is
+architecture v1 of v_register_file is
 type vector_register is array(0 to vector_length / bus_width - 1) of std_logic_vector(bus_width - 1 downto 0);
 type registerFile is array(0 to nr_of_vectors - 1) of vector_register;
 

@@ -16,6 +16,7 @@ ENTITY control_unit_lane IS
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
+        MEM_READ,MEM_WRITE      : OUT STD_LOGIC;
         -- Add write enable signals to block when reading/writing to memory
         REGR_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGW_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -146,10 +147,31 @@ begin
 
             case op_cat is
                 -- macc funct6 = "101101"
-                when VL_unit_stride => null; -- Todo
+                when VL_unit_stride => -- Todo
+                    case ld_st_signal.field3 is
+                        when "00000" => null; -- unit-stride load
+
+                        when "01000" => null; -- unit-stride, whole register load
+                        
+                        when "01011" => null; -- unit-stride, mask load, EEW=8
+                        
+                        when "10000" => null; -- unit-stride fault-only-first
+                        
+                        when others  => null; 
+                    end case;
                 --when VLS_strided => null; -- not doing this
                 --when VLX_indexed => null; -- not doing this
-                when VS_unit_stride => null; -- Todo
+                when VS_unit_stride => -- Todo
+                    case ld_st_signal.field3 is
+                        when "00000" => null; -- unit-stride store
+
+                        when "01000" => null; -- unit-stride, whole register store
+                        
+                        when "01011" => null; -- unit-stride, mask store, EEW=8
+                        
+                        when others  => null; 
+                    end case;
+                
                 --when VSS_strided => null; -- not doing this 
                 --when VSX_indexed => null; -- not doing this
                 --when OPIVV | OPIVX | OPIVI => null; 
