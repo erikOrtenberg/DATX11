@@ -33,4 +33,8 @@ en fifobuffer och minne. Fredrik arbetade med maccenhet samt testbänkar. Johann
 
 ## Vecka 8
 
-Samtiliga medlemmar närvarande på veckomötet. Vi diskuterade om implementationen av VRFen och ändrade designen en del. Vi vidareutvecklade på detta under veckan. Vi även började testa existerande komponenter som maccen och buffern. På torsdagen förberedde vi oss för fackspråksmötet/opponeringen som vi sen hade på fredagen. På mötet fick vi en kritik för vår rapport. Till sist gjorde vi alla enskilt egen-utvärderingen. 
+Samtiliga medlemmar närvarande på veckomötet. Vi diskuterade om implementationen av VRFen och ändrade designen en del. Vi vidareutvecklade på detta under veckan. Vi även började testa existerande komponenter som maccen och buffern. På torsdagen förberedde vi oss för fackspråksmötet/opponeringen som vi sen hade på fredagen. På mötet fick vi en kritik för vår rapport. Till sist gjorde vi alla enskilt egen-utvärderingen.
+
+## Vecka Tenta
+
+På grund av misskommunikation angående möte på tentavecka blev det veckoenliga mötet skjutet till onsdag där alla utom Johannes deltog. Under detta möte gjordes stora framsteg inom VPUns design och bilden av vad som behövde göras blev starkt klarare. Vi bestämde också att alla eftermiddagar på veckodagar 13-17 är arbetstid för de som kan. Erik har finslipat de existerande komponenterna till VPUn och sammanställt dem. På mötet med Mateo på torsdagen var alla utom Johannes och Erik närvarande. På detta mötet fick vi feedback på halvtidsredovisningen och riktlinjer för arbetsuppdelning. 
