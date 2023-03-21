@@ -28,6 +28,8 @@ architecture v1 of lane is
 
     signal wb_register              : std_logic_vector(bus_width - 1 downto 0);   --dont think we dont actually need this but ill leave it for readability
     signal A,B,C,R                  : std_logic_vector(bus_width - 1 downto 0);
+    signal v_use_a,v_use_b,v_use_c  : std_logic;
+    signal x_use_a,x_use_b,x_use_c  : std_logic;
     signal regASel,regBSel,regCSel  : std_logic_vector(nr_of_reg_addr_bits - 1 downto 0);
     signal ALU_OP                   : std_logic_vector(1 downto 0);
     
@@ -36,7 +38,7 @@ architecture v1 of lane is
     -- Controller signals
 
     --signal regIndex                 : std_logic_vector(1 downto 0);
-    signal regRead                  : std_logic;    -- currently unused
+    signal regRead                  : std_logic; 
     signal regWrite                 : std_logic;
     signal awaitingNewInstr         : std_logic;
 
@@ -59,6 +61,12 @@ begin
             REG_A       => regASel,
             REG_B       => regBSel,
             REG_C       => regCSel,
+            V_USE_A     => v_use_a,
+            V_USE_B     => v_use_b,
+            V_USE_C     => v_use_c,
+            X_USE_A     => x_use_a,
+            X_USE_B     => x_use_b,
+            X_USE_C     => x_use_c,
             REGR_IDX    => readRegSel,
             REGW_IDX    => writeRegSel,
             REGR        => regRead,
@@ -79,8 +87,11 @@ begin
             resetn      => resetn,
             outA        => A, 
             outB        => B, 
-            outC        => C, 
-            dataIn      => write_data,
+            outC        => C,
+            outA_OE     => v_use_a, 
+            outB_OE     => v_use_b, 
+            outC_OE     => v_use_c, 
+            dataIn      => wb_register,
             regASel     => regASel, 
             regBSel     => regBSel, 
             regCSel     => regCSel,
@@ -100,7 +111,7 @@ begin
 
     wb_register <= R;   --hmm dont think this is correct 
 
-    write_data <= wb_register when is_mem = '1' else mem_data;    
+    --write_data <= wb_register when is_mem = '1' else mem_data;    
 
     
 --lol fix things
