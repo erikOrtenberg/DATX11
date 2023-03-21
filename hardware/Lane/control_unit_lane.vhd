@@ -79,6 +79,10 @@ begin
         ST_FP       when others; -- "0100111";
         
 
+    with state select DONE <=
+        '1' when INSTR,
+        '0' when others; 
+
     with state select REGR_IDX <=
         "00" when EX1,
         "01" when EX2,
