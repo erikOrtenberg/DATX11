@@ -17,6 +17,7 @@ ENTITY control_unit_lane IS
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
         MEM_READ,MEM_WRITE      : OUT STD_LOGIC;
+        WB_WRITE_ENABLE         : OUT STD_LOGIC;
         -- Add write enable signals to block when reading/writing to memory
         REGR_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGW_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -108,6 +109,19 @@ begin
     begin
         if(resetn = '0') then 
             advance <= '0';
+            mem_read <= '0';
+            mem_write <= '0';
+            V_USE_A <= '0';
+            V_USE_B <= '0';
+            V_USE_C <= '0';
+            X_USE_A <= '0';
+            X_USE_B <= '0';
+            X_USE_C <= '0';
+            WB_WRITE_ENABLE <= '0';
+            REG_A   <= (others => '0');
+            REG_B   <= (others => '0');
+            REG_C   <= (others => '0');
+            ALU_OP  <= (others => '0');
         else 
             advance <= '1';
             case op_type is

@@ -29,14 +29,19 @@ architecture v1 of dummy_mem is
         process (clk)
         begin
             if rising_edge(clk) then 
-                if m_write = '1' then m_array(to_integer(unsigned(m_addr))) <= data_in; end if;
+                if m_write = '1' then 
+                    m_array(to_integer(unsigned(m_addr))) <= data_in; 
+                end if;
             end if;
         end process;
 
         process (m_read, m_addr) 
         begin
-            data_out <= (others => '0');
-            if m_read = '1' then data_out <= m_array(to_integer(unsigned(m_addr))); end if;
+            if m_read = '1' then 
+                data_out <= m_array(to_integer(unsigned(m_addr))); 
+            else 
+                data_out <= (others => 'U');
+            end if;
         end process;
 
 end v1;

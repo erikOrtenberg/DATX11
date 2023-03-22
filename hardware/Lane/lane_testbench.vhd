@@ -17,8 +17,8 @@ architecture test of lane_testbench is
         port (
             clk                 : in std_logic;
             resetn              : in std_logic;
-            control_signal      : in std_logic_vector(31 downto 0);
-            done                : out std_logic
+            op_code             : in std_logic_vector(31 downto 0);
+            scalar_input        : in std_logic_vector(63 downto 0)
         );
     end component lane;
 
@@ -28,6 +28,8 @@ architecture test of lane_testbench is
     FILE vectorFile: TEXT OPEN READ_MODE is "/home/fredrik/src/DATX11/vectorfile.txt";
 
 
+    signal op_code : std_logic_vector(31 downto 0);
+    signal scalar_input : std_logic_vector(63 downto 0);
 
 begin
 
@@ -35,8 +37,8 @@ begin
         port map (
             clk => clk,
             resetn => resetn,
-            control_signal => control_signal,
-            done => done
+            op_code => op_code,
+            scalar_input => scalar_input
         );
         
 
@@ -108,11 +110,10 @@ begin
         
 
     clk <= not clk after 10 ns;
- --   resetn <= '0', '1' after 40 ns;
-    
-    control_signal <= "10110110000000001000000101010111";
-  --  control_signal <= "10101010101010001011010011010111";
-    
-  --  << signal .lane_testbench.lane.work.register_file.registers : std_logic_vector(8191 DOWNTO 0) >>
-end process;
-end test;
+    resetn <= '0', '1' after 40 ns;
+
+    op_code         <= "10110110101010001010100011010111";
+    scalar_input    <= "0000000000000000000000000000000000000000000000000000000000000000";
+
+
+end test; 
