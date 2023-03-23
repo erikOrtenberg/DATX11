@@ -14,8 +14,8 @@ entity lane is
     port(
         clk                 : in std_logic;
         RESETN              : in std_logic;
-        op_code      : in std_logic_vector(op_length - 1 downto 0);
-        scalar_input        : in std_logic_vector(bus_width - 1 downto 0)
+        op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
+	done		    : out std_logic
     --todo add ports
     );
 end lane;
@@ -87,7 +87,7 @@ begin
             DONE            => awaitingNewInstr
         );
 
-    mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
+    -- mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
     mem : entity work.dummy_mem(v1)
         port map(
             clk         => clk,
@@ -141,6 +141,8 @@ begin
             writeRegSel => writeRegSel,
             writeEnable => regWrite
         );
+
+    done <= awaitingNewInstr;
 
     alu0: entity work.ALU(v1)
         port map(
