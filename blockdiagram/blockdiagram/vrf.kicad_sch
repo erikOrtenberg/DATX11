@@ -1,0 +1,31 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid f8094cfe-25b8-437b-bb39-d766907d039a)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (hierarchical_label "Data In" (shape input) (at 69.85 55.88 180) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify right))
+    (uuid 381a9f0d-44f1-4e39-aef3-d9b07993b377)
+  )
+  (hierarchical_label "Control Signals" (shape input) (at 102.87 43.18 90) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid 6bf61cde-cba7-4a0f-b4bb-97391d4ca316)
+  )
+  (hierarchical_label "B" (shape output) (at 121.92 54.61 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid 75a1034b-aac8-41fb-88d9-94cdc6e4b6ee)
+  )
+  (hierarchical_label "C" (shape output) (at 121.92 60.96 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid 7824b1fb-e01a-4513-8503-cc4ce4a5b4bd)
+  )
+  (hierarchical_label "A" (shape output) (at 121.92 48.26 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid b641471e-8a46-4b51-ad2c-11212bd0e14c)
+  )
+)

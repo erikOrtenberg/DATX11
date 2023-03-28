@@ -1,0 +1,23 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid d017ee4d-b012-4cc9-aeb6-caf6fb4952b1)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (hierarchical_label "Base Address" (shape input) (at 64.77 50.8 90) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid 11c20e71-ea1c-4f76-8453-d142df9a74d1)
+  )
+  (hierarchical_label "Data Out" (shape output) (at 64.77 86.36 270) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify right))
+    (uuid 89d60850-c0a5-4487-94df-cbcda2aef9d7)
+  )
+  (hierarchical_label "Control Signals" (shape input) (at 76.2 50.8 90) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid f7d297de-4849-456a-9c09-a055add1309b)
+  )
+)

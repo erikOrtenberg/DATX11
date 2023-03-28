@@ -1,0 +1,15 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid 76189012-499f-4a02-8d32-d01e2b9c93bb)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (hierarchical_label "State" (shape output) (at 43.18 31.75 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid c5b5089a-62c0-4496-8a37-8ea73dd1adef)
+  )
+)

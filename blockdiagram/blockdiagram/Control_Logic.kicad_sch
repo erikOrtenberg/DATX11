@@ -1,0 +1,27 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid b5172eb5-22ba-4c17-8a5d-8527fedf865e)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (hierarchical_label "ALU Control Signals" (shape output) (at 93.98 45.72 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid a028d241-f93e-45b5-a8b5-0dc59d11ffb3)
+  )
+  (hierarchical_label "State" (shape input) (at 49.53 50.8 180) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify right))
+    (uuid c1e6b424-8816-4114-83dd-26ac6469b845)
+  )
+  (hierarchical_label "VRF Control Signals" (shape output) (at 93.98 50.8 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid cb7fc2bd-8f08-4567-86e7-797d3a844dc0)
+  )
+  (hierarchical_label "Memory Control Signals" (shape output) (at 93.98 55.88 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid cc977984-7324-41d2-89f2-895f5e840776)
+  )
+)
