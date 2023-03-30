@@ -5,10 +5,10 @@ use ieee.numeric_std.all;
 entity fifo_buffer_axi is
     generic
     (
-        bus_width       : integer := 64;
+        bus_width       : integer := 32;
         buffer_length   : integer := 8; -- amount of buffers
         buffer_address  : integer := 4; -- 2log of buffers + 1
-        keep_size       : integer := 8  -- 2log of bus_width
+        keep_size       : integer := 5  -- 2log of bus_width
     ); 
     port
     (    
