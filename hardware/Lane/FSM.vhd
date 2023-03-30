@@ -8,6 +8,7 @@ entity lane_fsm is
          advance            :   in std_logic;
          clk                :   in std_logic;
          resetn             :   in std_logic;
+         VLENB              :   in std_logic_vector(3 DOWNTO 0);
          state              :   OUT lane_state_type
          );
 end lane_fsm;

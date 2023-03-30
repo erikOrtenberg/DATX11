@@ -28,6 +28,53 @@ package Common_pkg is    -- untested...
         field1      : std_logic_vector(4 downto 0);
     end record OP_V;
 
+    type VTYPE is RECORD
+      vill:   std_logic;
+      reserved: std_logic_vector(54 DOWNTO 0);
+      vma:    std_logic;
+      vta:    std_logic;
+      vsew:   std_logic_vector(2 DOWNTO 0);
+      vlmul:  std_logic_vector(2 DOWNTO 0);
+    end record VTYPE;
+    
+    type vl is RECORD
+      vl:   std_logic_vector(63 DOWNTO 0);
+    end record vl;
+    
+    type vlenb is RECORD
+      vlenb:  std_logic_vector(63 DOWNTO 0);
+    end record vlenb;
+    
+    type vstart is RECORD
+      vstart: std_logic_vector(8 DOWNTO 0);
+    end record vstart;
+    
+    type vxrm is RECORD
+      reserved: std_logic_vector(63 DOWNTO 2);
+      roundmode:  std_logic_vector(1 DOWNTO 0);
+    end record vxrm;
+    
+    type vxsat is RECORD
+      reserved: std_logic_vector(63 DOWNTO 1);
+      sat:      std_logic;
+    end record vxsat;
+    
+    type vcsr is RECORD
+      vxrm:   std_logic_vector(1 DOWNTO 0);
+      vxsat:  std_logic;
+    end record vcsr;
+
+    type crs is RECORD
+      VTYPE:  VTYPE;
+      VL:     vl;
+      vstart: vstart;
+      VXRM:   VXRM;
+      VXSAT:  vxsat;
+      VCSR:   vcsr;
+      VLB:    VLENB;
+    end record crs;
+
+
     type op_category is (
         VL_unit_stride, 
         VLS_strided, 
@@ -55,3 +102,5 @@ end Common_pkg;
 package body Common_pkg is
    -- subprogram bodies here
 end Common_pkg;
+
+

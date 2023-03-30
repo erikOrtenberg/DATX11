@@ -13,6 +13,7 @@ ENTITY control_unit_lane IS
         resetn: IN STD_LOGIC;
 
         OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
+        VLENB                   : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
@@ -34,6 +35,7 @@ component lane_fsm IS
         advance             :   in std_logic;
         clk                 :   in std_logic;
         resetn              :   in std_logic;
+        VLENB               :   in std_logic_vector(3 DOWNTO 0);
         state               :   out lane_state_type
     );
 end component;    
@@ -50,6 +52,7 @@ signal ld_st_signal : LOAD_STORE_FP;
 signal op_type      : OP_CODE;
 
 signal op_cat       : OP_CATEGORY; 
+signal ex:            crs;
 
 begin
     
@@ -73,7 +76,7 @@ begin
         field1  => op(11 downto 7)
     );
 
-    FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn, state => state);
+    FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn, VLENB => VLENB, state => state);
 
     with OP(6 downto 0) select op_type <=
         OP_VEC      when "1010111",

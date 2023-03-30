@@ -1,9 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.common_pkg.all;
 
 entity lane is
   generic(
-      VLEN                : integer := 256;
+      MAX_VLEN            : integer := 256;
       bus_width           : integer := 64;
       nr_of_reg_addr_bits : integer := 5;
       nr_of_vectors       : integer := 32;
@@ -15,7 +16,7 @@ entity lane is
       clk                 : in std_logic;
       RESETN              : in std_logic;
       op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
-done		    : out std_logic
+      done		    : out std_logic
   --todo add ports
   );
 end lane;
@@ -50,6 +51,12 @@ architecture v1 of lane is
   signal mem_read,mem_write       : std_logic;
   signal mem_addr                 : std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
 
+  -- Control regisiternś
+  signal csigs:    crs;
+  signal write_csr: std_logic;
+  signal write_vl:  std_logic;
+  signal write_vlb: std_logic;
+
   -- Scalar register signals
 
   --signal x_data_in,x_data_out     : std_logic_vector(bus_width - 1 downto 0);
@@ -71,6 +78,7 @@ begin
           clk             => clk, 
           resetn          => resetn,
           OP              => op_code,
+          VLENB           => csigs.VLB.VLENB(3 DOWNTO 0),
           REG_A           => regASel,
           REG_B           => regBSel,
           REG_C           => regCSel,
@@ -123,7 +131,7 @@ begin
 
   vreg : entity work.v_register_file(v1) 
       generic map(
-          vector_length   => VLEN,
+          vector_length   => MAX_VLEN,
           bus_width       => bus_width,
           nr_of_vectors   => nr_of_vectors,
           nr_of_addr_bits => nr_of_reg_addr_bits
@@ -148,6 +156,17 @@ begin
 
   done <= awaitingNewInstr;
 
+  creg: entity work.ctrlrg (v1) 
+    PORT MAP(
+      clk => clk,
+      resetn => resetn,
+      write_csr => write_csr,
+      write_vl => write_vl,
+      write_vlb => write_vlb,
+      update => csigs,
+      data => csigs
+            );
+
   alu0: entity work.ALU(v1)
       port map(
           A=>A, 
@@ -156,21 +175,5 @@ begin
           R=>R, 
           op=>ALU_OP
       );
-
---  reset : process(mem_read, resetn, clk)
---  begin    
---      if (resetn = '0') then 
---          wb_register <= (others => '0');
---      elsif(falling_edge(clk) and wb_writeEnable = '1') then
---          if(mem_read = '1') then
---              wb_register <= mem_data_out;
---          else
---              wb_register <= R;
---          end if;
---      end if;
---  end process;
-
-  
---lol fix things
 
 end v1;
