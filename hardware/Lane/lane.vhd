@@ -131,7 +131,7 @@ begin
 
   vreg : entity work.v_register_file(v1) 
       generic map(
-          vector_length   => MAX_VLEN,
+          MAX_VLEN        => MAX_VLEN,
           bus_width       => bus_width,
           nr_of_vectors   => nr_of_vectors,
           nr_of_addr_bits => nr_of_reg_addr_bits

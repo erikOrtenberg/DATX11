@@ -9,7 +9,7 @@ entity dummy_mem is
     generic(
         data_w : integer := 64;   --data width 
         addr_w : integer := 32;   --addr width
-        mem_init_file : string := "/home/kryddan/repos/DATX11/hardware/Memory/memory.mif"
+        mem_init_file : string := "/home/fredrik/src/DATX11/hardware/Memory/memory.mif"
         );
     port (
         clk : in std_logic;

@@ -26,7 +26,7 @@ architecture test of lane_testbench is
     signal op_code : std_logic_vector(31 downto 0);
     signal expected: std_logic_vector(63 DOWNTO 0);
     signal done: std_logic;
-    FILE vectorFile: TEXT OPEN READ_MODE is "/home/kryddan/repos/DATX11/vectorfile.txt";
+    FILE vectorFile: TEXT OPEN READ_MODE is "/home/fredrik/src/DATX11/vectorfile.txt";
 
 
 
