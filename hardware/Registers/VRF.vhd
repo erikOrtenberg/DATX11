@@ -1,13 +1,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.common_pkg.ALL;
 
 
 
 entity v_register_file is   
     generic(
-        vector_length   : integer   := 256;
-        bus_width      : integer   := 64;
+        MAX_VLEN        : integer   := 256;
+        bus_width       : integer   := 64;
         nr_of_vectors   : integer   := 32;
         nr_of_addr_bits : integer   := 5
     );
@@ -31,8 +32,6 @@ entity v_register_file is
 end v_register_file;
 
 architecture v1 of v_register_file is
-type vector_register is array(0 to vector_length / bus_width - 1) of std_logic_vector(bus_width - 1 downto 0);
-type registerFile is array(0 to nr_of_vectors - 1) of vector_register;
 
 signal registers : registerFile;
 

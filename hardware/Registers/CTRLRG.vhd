@@ -23,7 +23,7 @@ begin
 
   PROCESS(clk,resetn)
   begin
-    if(resetn = '1') then
+    if(resetn = '0') then
       state.VSTART  <= (OTHERS => (OTHERS => '0'));
       state.VXRM    <= (OTHERS => (OTHERS => '0'));
       state.VXSAT.RESERVED   <= (OTHERS => '0');

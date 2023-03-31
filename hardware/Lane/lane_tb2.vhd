@@ -22,11 +22,9 @@ architecture test of lane_tb2 is
         );
     end component lane;
 
-    type REG_ENTRY is ARRAY(0 TO 3) of STD_LOGIC_VECTOR(63 DOWNTO 0);
-
     signal clk, resetn : std_logic := '0';
     signal op_code : std_logic_vector(31 downto 0);
-    signal expected: REG_ENTRY;
+    signal expected: vector_register;
     signal done: std_logic;
     FILE vectorFile: TEXT OPEN READ_MODE is "/home/fredrik/src/DATX11/seq_file.txt";
 
@@ -58,8 +56,8 @@ begin
     alias state is
       << signal .lane_tb2.lane_instance.ctrl.FSM1.current_state : lane_state_type >>;
 
---    alias regs is 
---      << signal .lane_tb2.lane_instance.vreg.registers : registerFile >>;
+    alias regs is 
+      << signal .lane_tb2.lane_instance.vreg.registers : registerFile >>;
 
     VARIABLE vline: LINE;
     Variable a_v,b_v,c_v,r_v : std_logic_vector(63 DOWNTO 0);
@@ -104,6 +102,7 @@ begin
     state <= release;
     op_code <= "10110110000000001010000101010111";
     WHILE not ENDFILE(vectorFile) LOOP
+    wait on done;
     readline(vectorFile,vline);
     testing: FOR i IN 0 to 3 LOOP
       read(vline,r_v);
@@ -111,12 +110,19 @@ begin
       read(vline,space);
     end LOOP;
 
-    wait on done;
+    wait for 5 ns;
+    ASSERT expected = regs(2)
+      REPORT "Expected does not match actual result of computation"
+      severity ERROR;
+
     wait on done;
    end LOOP;
    op_code <= "10110110000000001010000011010111";
    wait on done;
    wait on done;
+   ASSERT false
+      REPORT "Simulation complete"
+      severity FAILURE;
        
     
         

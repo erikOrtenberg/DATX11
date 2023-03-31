@@ -91,6 +91,10 @@ package Common_pkg is    -- untested...
         OPMVX,
         OPCFG);
 
+    type vector_register is array(0 to 3) of std_logic_vector(63 DOWNTO 0);
+    type registerFile is array(0 to 31) of vector_register;
+    
+
 
    -- (optional) useful tools
    --function to_slv (e : my_enum_type) return std_logic_vector;
