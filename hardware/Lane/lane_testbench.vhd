@@ -24,7 +24,7 @@ architecture test of lane_testbench is
 
     signal clk, resetn : std_logic := '0';
     signal op_code : std_logic_vector(31 downto 0);
-    signal expected: std_logic_vector(63 DOWNTO 0);
+    signal expected: vector_register;
     signal done: std_logic;
     FILE vectorFile: TEXT OPEN READ_MODE is "/home/fredrik/src/DATX11/vectorfile.txt";
 
@@ -55,6 +55,9 @@ begin
       << signal .lane_testbench.lane_instance.writeregsel : std_logic_vector(1 downto 0) >>;
     alias state is
       << signal .lane_testbench.lane_instance.ctrl.FSM1.current_state : lane_state_type >>;
+    alias regs is
+      << signal .lane_testbench.lane_instance.vreg.registers : registerFile >>;
+
     VARIABLE vline: LINE;
     Variable a_v,b_v,c_v,r_v : std_logic_vector(63 DOWNTO 0);
     VARIABLE space : CHARACTER;
@@ -88,7 +91,7 @@ begin
        
        reg_addr <= force "00010";
        regIn <= force c_v;
-       expected <= r_v;
+       expected(i) <= r_v;
        wait for 20 ns;
        
     end LOOP;
@@ -100,20 +103,15 @@ begin
     op_code <= "10110110000000001010000101010111";
     wait on done;
     wait on done;
-    op_code <= "00000000000000000000000000000000";
+    ASSERT expected = regs(2)
+      REPORT "Expected result does not match actual"
+      severity ERROR;
    end LOOP;
-       
-    
-        
-            
 
-
-        
-
+  ASSERT FALSE 
+    REPORT "Simulation complete"
+    severity FAILURE;
      --   resetn <= '0', '1' after 40 ns;
     
-  --  control_signal <= "10101010101010001011010011010111";
-    
-  --  << signal .lane_testbench.lane.work.register_file.registers : std_logic_vector(8191 DOWNTO 0) >>
 end process;
 end test;
