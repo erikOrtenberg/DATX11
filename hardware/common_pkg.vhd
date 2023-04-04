@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 package Common_pkg is    -- untested...
 
-    type lane_state_type is (INSTR, EX1, EX2, EX3, EX4, EX5);
+    type lane_state_type is (INSTR, EX1, EX2, EX3, EX4);
 
     type OP_CODE is (LD_FP, ST_FP, OP_VEC);
 

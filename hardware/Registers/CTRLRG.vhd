@@ -31,22 +31,31 @@ begin
       state.VCSR.vxrm    <= (OTHERS => '0');
       state.VCSR.vxsat    <= '0';
       state.VL.VL <= std_logic_vector(to_unsigned(256,64));
-      state.VLB.VLENB <= std_logic_vector(to_unsigned(32,64));
+      state.VLB.vlenb <= std_logic_vector(to_unsigned(32,64));
+
+      state.vtype.vill <= '0';
+      state.vtype.reserved <= (OTHERS => '0');
+      state.vtype.vma <= '0';
+      state.vtype.vta <= '0';
+      state.vtype.vsew <= (OTHERS => '0');
+      state.vtype.vlmul <= (OTHERS => '0');
     end IF;
 
     if(rising_edge(clk)) then
       CASE write_csr IS
-        when '0' => state.VCSR <= update.VCSR;
+        when '1' => state.VCSR <= update.VCSR;
         when others => null;
       end case;
 
       CASE write_vl IS
-        when '0' => state.VL <= update.VL;
+        when '1' => state.VL <= update.VL;
         when others => null;
       end case;
 
       CASE write_vlb IS
-        when '0' => state.VLB <= update.VLB;
+        when '1' => 
+          report "Trying to assign VLB" severity note;
+          state.VLB <= update.VLB;
         when others => null;
       end case;
     end IF;

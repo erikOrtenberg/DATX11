@@ -52,7 +52,7 @@ architecture v1 of lane is
   signal mem_addr                 : std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
 
   -- Control regisiternś
-  signal csigs:    crs;
+  signal csigs:     crs;
   signal write_csr: std_logic;
   signal write_vl:  std_logic;
   signal write_vlb: std_logic;
@@ -68,7 +68,7 @@ begin
     R WHEN '0',
     mem_data_out when OTHERS;
 
-  ctrl : entity work.control_unit_lane(v1)
+  ctrl : entity work.control_unit_lane(ASYNC)
       generic map (
           NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
           OP_LENGTH       => op_length,
@@ -78,7 +78,7 @@ begin
           clk             => clk, 
           resetn          => resetn,
           OP              => op_code,
-          VLENB           => csigs.VLB.VLENB(3 DOWNTO 0),
+          VLENB           => csigs.VLB.VLENB,
           REG_A           => regASel,
           REG_B           => regBSel,
           REG_C           => regCSel,
