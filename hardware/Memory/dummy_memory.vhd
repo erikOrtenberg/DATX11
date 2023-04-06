@@ -4,20 +4,52 @@ use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 use std.textio.all; 
 
--- primitive memory that one can load from and read
+--- SIMULATION MEMORY WITH INTERNAL BUFFER ---
+
+--  read_op IN
+--      control bit. When HIGH the memory will read from the specified
+--      address into the internal buffer.
+--
+--  write_op IN
+--      control bit. When HIGH the memory will write from internal buffer
+--      into memory given that it contains elements. 
+--
+--  addr IN
+--      address port.
+-- 
+--  data_in IN
+--      port for incoming data to be stored. writes to the internal buffer.
+--
+--  data_out OUT
+--      port for outgoing data. reads from the internal buffer.
+--
+--  read_ready OUT
+--      control bit. set HIGH when buffer contains data.
+--
+--  write_ready IN
+--      control bit. tells the buffer to write from data_in to the 
+--      internal buffer.
+--
+--  continue OUT
+--      control bit. tells the outside to progress the read or not.
+
 entity dummy_mem is 
     generic(
         data_w : integer := 64;   --data width 
         addr_w : integer := 32;   --addr width
-        mem_init_file : string := "/home/kryddan/repos/DATX11/hardware/Memory/memory.mif"
+        elements_to_fetch : integer := 4; -- basically VLEN
+        mem_init_file : string := "C:\Users\The Cube\Desktop\repos\DATX11\hardware\Memory"
         );
     port (
-        clk : in std_logic;
-        m_read : in std_logic;
-        m_write : in std_logic;
-        m_addr : in std_logic_vector(addr_w-1 downto 0);
-        data_in : in std_logic_vector(data_w -1 downto 0);
-        data_out : out std_logic_vector(data_w-1 downto 0)
+        clk         : in std_logic;
+        read_op     : in std_logic;
+        write_op    : in std_logic;
+        addr        : in std_logic_vector(addr_w-1 downto 0);
+        data_in     : in std_logic_vector(data_w -1 downto 0);
+        data_out    : out std_logic_vector(data_w-1 downto 0);
+        read_ready  : out std_logic;
+        write_ready : in std_logic;
+        continue    : out std_logic
         );
 end dummy_mem;
 
@@ -26,6 +58,8 @@ architecture v1 of dummy_mem is
     type mem_array is array (0 to (addr_w)-1) 
         of std_logic_vector(data_w-1 downto 0);
 
+    -- SIMULATION ONLY STUFF
+    -- this fetches the inital memory configuration from the memory.mif file
     impure function init_memory_wfile(mif_file_name : in string) return mem_array is
         file mif_file       : text open read_mode is mif_file_name;
         variable mif_line   : line;
@@ -41,25 +75,67 @@ architecture v1 of dummy_mem is
     end function;
     signal m_array : mem_array := init_memory_wfile(mem_init_file);
 
-    begin 
-        process (clk)
+    -- ACTUAL LOGIC
+
+    signal buf_read_data   : std_logic_vector(data_w-1 downto 0);
+    signal buf_read_valid  : std_logic;
+    signal buf_read_ready  : std_logic;
+    signal buf_write_data  : std_logic_vector(data_w-1 downto 0);
+    signal buf_write_valid : std_logic;
+    signal buf_write_ready : std_logic;
+
+    signal internal_counter : integer; 
+
+    begin
+        buf: entity work.fifo_buffer(v1)
+        port map(
+            read_data   => buf_read_data,
+            read_valid  => buf_read_valid, 
+            read_ready  => buf_read_ready,
+            write_data  => buf_write_data,
+            write_valid => buf_write_valid,
+            write_ready => buf_write_ready,
+            clk         => clk
+        );
+        
+        read_write: process (clk, read_op, write_op)
         begin
-            if rising_edge(clk) then 
-                if m_write = '1' then 
-                    m_array(to_integer(unsigned(m_addr(4 downto 0)))) <= data_in; 
+            continue <= '0';
+            if(rising_edge(read_op) or rising_edge(write_op)) then
+                internal_counter <= 0;
+            end if;
+            if(rising_edge(clk)) then
+                buf_read_ready  <= '0';
+                buf_write_valid <= '0';
+                if(read_op = '1') then
+                    -- reading from the internal buffer to the outside
+                    if(buf_read_valid = '1') then
+                        continue <= '1';
+                        data_out <= buf_read_data;
+                        buf_read_ready <= '1';
+                    end if;
+                    -- reading from memory to the internal buffer
+                    if(read_op = '1' and internal_counter < 4 and buf_write_ready = '1') then
+                        buf_write_data <= m_array(to_integer(unsigned(addr)) + internal_counter);
+                        buf_write_valid <= '1';
+                        internal_counter <= internal_counter + 1;
+                    end if;
+                elsif(write_op = '1') then
+                    -- write from outside to internal buffer
+                    if(buf_write_ready = '1' and write_ready = '1') then
+                        continue <= '1';
+                        buf_write_data <= data_in;
+                        buf_write_valid <= '1';
+                    end if;
+                    -- write from the internal buffer to memory
+                    if(internal_counter < 4 and buf_read_valid = '1') then
+                        m_array(to_integer(unsigned(addr)) + internal_counter) <= buf_read_data;
+                        buf_read_ready <= '1';
+                        internal_counter <= internal_counter + 1;
+                    end if;
                 end if;
             end if;
         end process;
-
-        process (m_read, m_addr) 
-        begin
-            if m_read = '1' then 
-                data_out <= m_array(to_integer(unsigned(m_addr(4 downto 0)))); 
-            else 
-                data_out <= (others => 'U');
-            end if;
-        end process;
-
 end v1;
 
 

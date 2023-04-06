@@ -25,7 +25,7 @@ entity fifo_buffer is
     );
 end fifo_buffer;
 
-architecture behavioral of fifo_buffer is
+architecture v1 of fifo_buffer is
 
 type buffer_type is array(0 to buffer_length - 1) of std_logic_vector(bus_width - 1 downto 0);
 signal buf : buffer_type;
@@ -70,4 +70,4 @@ begin
         empty when write_pointer =  read_pointer
         else other;
 
-end behavioral;
+end v1;

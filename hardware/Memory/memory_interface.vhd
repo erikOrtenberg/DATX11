@@ -17,12 +17,9 @@ use ieee.numeric_std.all;
 --  output_enable/write_enable
 --      self explaintory
 --
---  valid
---      Is set when the internal buffer is ready to provide the vector
+--  continue
+--      Is set when the processor can continue to the next FSM state
 -- 
---  consume
---      On rising edge, the next element in the internal memory buffer should be presented
---
 
 entity memory_interface is
     generic(
@@ -34,25 +31,36 @@ entity memory_interface is
         address         : in std_logic_vector (addr_w - 1 downto 0);       
         data_write      : in std_logic_vector (data_w - 1 downto 0);
         data_read       : out std_logic_vector (data_w - 1 downto 0);
-        output_enable   : out std_logic;
-        write_enable    : out std_logic;
-        valid           : out std_logic;
-        consume         : in std_logic
+        output_enable   : in std_logic;
+        write_enable    : in std_logic;
+        continue        : out std_logic
     );
 end memory_interface;
 
 architecture v1 of memory_interface is
 
-    signal 
+    -- shows if the memory module is ready to output an element
+    signal i_read_ready : std_logic;
+    -- tells the memory module if the data_in should be added 
+    -- to the internal buffer in next clk cycle 
+    signal i_write_ready : std_logic;
 
 begin
-    entity work.dummy_mem(v1)
+    -- initialize output signal valid = 0;
+    -- instantiate memory module
+    memory: entity work.dummy_mem(v1)
     port map(
-        m_read      => output_enable,
-        m_write     => write_enable,
-        m_addr      => address,
+        clk         => clk,
+        read_op     => output_enable,
+        write_op    => write_enable,
+        addr        => address,
         data_in     => data_write,
         data_out    => data_read,
+        read_ready  => i_read_ready,
+        write_ready => i_write_ready,
+        continue    => continue
     );
+
+
 
 end v1 ; -- memory_interface

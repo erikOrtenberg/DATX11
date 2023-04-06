@@ -22,85 +22,88 @@ end lane;
 
 
 architecture v1 of lane is
-  --todo add other components
+    --todo add other components
 
-  signal write_data               : std_logic_vector(bus_width - 1 downto 0);
+    signal write_data               : std_logic_vector(bus_width - 1 downto 0);
 
-  signal wb_register              : std_logic_vector(bus_width - 1 downto 0);   --dont think we dont actually need this but ill leave it for readability
-  signal wb_writeEnable           : std_logic := '1';
+    signal wb_register              : std_logic_vector(bus_width - 1 downto 0);   --dont think we dont actually need this but ill leave it for readability
+    signal wb_writeEnable           : std_logic := '1';
 
-  signal A,B,C,R                  : std_logic_vector(bus_width - 1 downto 0);
-  signal v_use_a,v_use_b,v_use_c  : std_logic;
-  signal x_use_a,x_use_b,x_use_c  : std_logic;
-  signal regASel,regBSel,regCSel  : std_logic_vector(nr_of_reg_addr_bits - 1 downto 0);
-  signal ALU_OP                   : std_logic_vector(1 downto 0);
-  
-  signal readRegSel, writeRegSel  : std_logic_vector(1 downto 0);
+    signal A,B,C,R                  : std_logic_vector(bus_width - 1 downto 0);
+    signal v_use_a,v_use_b,v_use_c  : std_logic;
+    signal x_use_a,x_use_b,x_use_c  : std_logic;
+    signal regASel,regBSel,regCSel  : std_logic_vector(nr_of_reg_addr_bits - 1 downto 0);
+    signal ALU_OP                   : std_logic_vector(1 downto 0);
+    
+    signal readRegSel, writeRegSel  : std_logic_vector(1 downto 0);
 
-  -- Controller signals
+    -- Controller signals
 
-  --signal regIndex                 : std_logic_vector(1 downto 0);
-  signal regRead                  : std_logic; 
-  signal regWrite                 : std_logic;
-  signal awaitingNewInstr         : std_logic;
+    --signal regIndex                 : std_logic_vector(1 downto 0);
+    signal regRead                  : std_logic; 
+    signal regWrite                 : std_logic;
+    signal awaitingNewInstr         : std_logic;
 
-  -- Memory signals
 
-  signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
-  signal mem_read,mem_write       : std_logic;
-  signal mem_addr                 : std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
+    signal continue                 : std_logic; -- the signal which halts the entire VPU if set LOW
+    -- Memory signals
 
-  -- Scalar register signals
+    signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
+    signal mem_read,mem_write       : std_logic;
+    signal mem_addr                 : std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
 
-  --signal x_data_in,x_data_out     : std_logic_vector(bus_width - 1 downto 0);
-  --signal x_writeEnable            : std_logic;
-  --signal x_writeRegSel            : std_logic_vector(4 downto 0);
+    -- Scalar register signals
+
+    --signal x_data_in,x_data_out     : std_logic_vector(bus_width - 1 downto 0);
+    --signal x_writeEnable            : std_logic;
+    --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
-  WITH mem_read SELECT wb_register <=
-    R WHEN '0',
-    mem_data_out when OTHERS;
+    WITH mem_read SELECT wb_register <=
+        R WHEN '0',
+        mem_data_out when OTHERS;
 
-  ctrl : entity work.control_unit_lane(v1)
-      generic map (
-          NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
-          OP_LENGTH       => op_length,
-          ALU_OP_LENGTH   => alu_op_length
-      )
-      port map(
-          clk             => clk, 
-          resetn          => resetn,
-          OP              => op_code,
-          REG_A           => regASel,
-          REG_B           => regBSel,
-          REG_C           => regCSel,
-          V_USE_A         => v_use_a,
-          V_USE_B         => v_use_b,
-          V_USE_C         => v_use_c,
-          X_USE_A         => x_use_a,
-          X_USE_B         => x_use_b,
-          X_USE_C         => x_use_c,
-          WB_WRITE_ENABLE => wb_writeEnable,
-          MEM_READ        => mem_read,
-          MEM_WRITE       => mem_write,
-          REGR_IDX        => readRegSel,
-          REGW_IDX        => writeRegSel,
-          REGR            => regRead,
-          REGW            => regWrite,
-          ALU_OP          => ALU_OP,
-          DONE            => awaitingNewInstr
-      );
+    ctrl : entity work.control_unit_lane(v1)
+        generic map (
+            NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
+            OP_LENGTH       => op_length,
+            ALU_OP_LENGTH   => alu_op_length
+        )
+        port map(
+            clk             => clk, 
+            resetn          => resetn,
+            OP              => op_code,
+            REG_A           => regASel,
+            REG_B           => regBSel,
+            REG_C           => regCSel,
+            V_USE_A         => v_use_a,
+            V_USE_B         => v_use_b,
+            V_USE_C         => v_use_c,
+            X_USE_A         => x_use_a,
+            X_USE_B         => x_use_b,
+            X_USE_C         => x_use_c,
+            WB_WRITE_ENABLE => wb_writeEnable,
+            MEM_READ        => mem_read,
+            MEM_WRITE       => mem_write,
+            REGR_IDX        => readRegSel,
+            REGW_IDX        => writeRegSel,
+            REGR            => regRead,
+            REGW            => regWrite,
+            ALU_OP          => ALU_OP,
+            DONE            => awaitingNewInstr
+        );
 
   -- mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
-  mem : entity work.dummy_mem(v1)
-      port map(
-          clk         => clk,
-          m_read      => mem_read,
-          m_write     => mem_write,
-          m_addr      => mem_addr,
-          data_in     => mem_data_in,
-          data_out    => mem_data_out
-      );
+    mem : entity work.memory_interface(v1)
+        port map(
+            clk             => clk,
+            address         => mem_addr,
+            data_write      => mem_data_in,
+            data_read       => mem_data_out,
+            output_enable   => mem_read,
+            write_enable    => mem_write,
+            continue        => continue
+          );
 
   -- Shouldn't be in the VPU
   --xreg : entity work.x_register_file(v1)
@@ -121,41 +124,41 @@ begin
    --       writeEnable     => x_writeEnable
    --   );
 
-  vreg : entity work.v_register_file(v1) 
-      generic map(
-          vector_length   => VLEN,
-          bus_width       => bus_width,
-          nr_of_vectors   => nr_of_vectors,
-          nr_of_addr_bits => nr_of_reg_addr_bits
-      )
-      port map(
-          clk         => clk, 
-          resetn      => resetn,
-          outA        => A, 
-          outB        => B, 
-          outC        => C,
-          outA_OE     => v_use_a, 
-          outB_OE     => v_use_b, 
-          outC_OE     => v_use_c, 
-          dataIn      => wb_register,
-          regASel     => regASel, 
-          regBSel     => regBSel, 
-          regCSel     => regCSel,
-          readRegSel  => readRegSel,
-          writeRegSel => writeRegSel,
-          writeEnable => regWrite
-      );
+    vreg : entity work.v_register_file(v1) 
+        generic map(
+            vector_length   => VLEN,
+            bus_width       => bus_width,
+            nr_of_vectors   => nr_of_vectors,
+            nr_of_addr_bits => nr_of_reg_addr_bits
+        )
+        port map(
+            clk         => clk, 
+            resetn      => resetn,
+            outA        => A, 
+            outB        => B, 
+            outC        => C,
+            outA_OE     => v_use_a, 
+            outB_OE     => v_use_b, 
+            outC_OE     => v_use_c, 
+            dataIn      => wb_register,
+            regASel     => regASel, 
+            regBSel     => regBSel, 
+            regCSel     => regCSel,
+            readRegSel  => readRegSel,
+            writeRegSel => writeRegSel,
+            writeEnable => regWrite
+        );
 
-  done <= awaitingNewInstr;
+    done <= awaitingNewInstr;
 
-  alu0: entity work.ALU(v1)
-      port map(
-          A=>A, 
-          B=>B, 
-          C=>C, 
-          R=>R, 
-          op=>ALU_OP
-      );
+    alu0: entity work.ALU(v1)
+        port map(
+            A=>A, 
+            B=>B, 
+            C=>C, 
+            R=>R, 
+            op=>ALU_OP
+        );
 
 --  reset : process(mem_read, resetn, clk)
 --  begin    
