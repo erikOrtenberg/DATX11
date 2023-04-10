@@ -31,19 +31,19 @@ architecture v1 of lane_fsm is
                     else current_state <= INSTR; 
                     end if;
                 when EX1  =>
-                  if (unsigned(VLENB) < 8)  then
+                  if (unsigned(VLENB) <= 8)  then
                     current_state <= INSTR;
                   else
                     current_state <= EX2;
                   end if;
                 when EX2  => 
-                  if (unsigned(VLENB) < 16) then
+                  if (unsigned(VLENB) <= 16) then
                     current_state <= INSTR;
                   else
                     current_state <= EX3;
                   end if;
                 when EX3  =>
-                  if (unsigned(VLENB) < 24) then
+                  if (unsigned(VLENB) <= 24) then
                     current_state <= INSTR;
                   else
                     current_state <= EX4; 

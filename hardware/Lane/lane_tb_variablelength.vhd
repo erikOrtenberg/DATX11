@@ -61,12 +61,7 @@ begin
     alias CSIGS is
       << signal .lane_tb.lane_instance.creg.state : crs >>;
 
-    alias CRUP is
-      << signal .lane_tb.lane_instance.csigs : crs >>;
-    alias write_vlb is
-      << signal .lane_tb.lane_instance.write_vlb : STD_LOGIC >>;
-
-    alias VLBR : VLENB is CSIGS.VLB;
+    alias VLR : VL is CSIGS.VL;
     -- alias VLENB : STD_LOGIC_VECTOR is VLBR.VLENB;
 
     VARIABLE vline: LINE;
@@ -75,15 +70,13 @@ begin
     VARIABLE nvl : UNSIGNED(63 DOWNTO 0) :=  (OTHERS => '0');
     begin
 
-      CRUP.VLB.VLENB <= force std_logic_vector(to_unsigned(32,64));
-    write_vlb <= '1';
     resetn <= '0';
     wait for 10 ns;
     resetn <= '1';
     regW <= force '1';
     state <= force INSTR;
+    op_code <= "10110110000000001010000101010111";
     wait for 10 ns;
-    write_vlb <= '0';
     loadReg: FOR i in 0 to 3 LOOP
        readline(vectorFile,vline);
        read(vline,a_v);
@@ -91,8 +84,6 @@ begin
        read(vline,b_v);
        read(vline,space);
        read(vline,c_v);
-       read(vline,space);
-       read(vline,r_v);
        
        reg_addr <= force "00000";
        reg_idx <= force std_logic_vector(to_signed(i,2));
@@ -103,27 +94,26 @@ begin
        regIn <= force b_v;
        wait for 20 ns;
        
-       
        reg_addr <= force "00010";
        regIn <= force c_v;
-       expected(i) <= r_v;
+       expected(i) <= c_v;
        wait for 20 ns;
        
     end LOOP;
+    wait until rising_edge(clk);
     reg_addr <= release;
     reg_idx <= release;
     regIn <= release;
     regW <= release;
     state <= release;
-    op_code <= "10110110000000001010000101010111";
     WHILE not ENDFILE(vectorFile) LOOP
-    wait on done;
-    readline(vectorFile,vline);
-    testing: FOR i IN 0 to 3 LOOP
-      read(vline,r_v);
-      expected(i) <= r_v;
-      read(vline,space);
-    end LOOP;
+      wait on done;
+      readline(vectorFile,vline);
+      testing: FOR I IN 0 To 3 LOOP
+        read(vline,r_v);
+        expected(i) <= r_v;
+        read(vline,space);
+      end loop;
 
     wait for 5 ns;
     ASSERT expected = regs(2)
@@ -131,23 +121,15 @@ begin
       severity ERROR;
 
     wait on done;
-    VLBR.vlenb <= STD_LOGIC_VECTOR(nvl);
-    NVL := (NVL + 8) mod 32;
+    op_code <= "11000000000000100111000001010111";
+    wait on done;
+    wait on done;
+    op_code <= "10110110000000001010000101010111";
    end LOOP;
-   op_code <= "10110110000000001010000011010111";
-   wait on done;
-   wait on done;
    ASSERT false
       REPORT "Simulation complete"
       severity FAILURE;
        
-    
-        
-            
-
-
-        
-
      --   resetn <= '0', '1' after 40 ns;
     
   --  control_signal <= "10101010101010001011010011010111";

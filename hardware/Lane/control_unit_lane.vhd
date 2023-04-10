@@ -14,6 +14,7 @@ ENTITY control_unit_lane IS
 
         OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
         VLENB                   : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+        VLEN                    : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
@@ -24,6 +25,9 @@ ENTITY control_unit_lane IS
         REGW_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGR,REGW               : OUT STD_LOGIC;
         ALU_OP                  : OUT STD_LOGIC_VECTOR(ALU_OP_LENGTH - 1 downto 0);
+        VLEN_U                  : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        VLENB_U                 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        WRITE_VL                : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC
     );
 end control_unit_lane;
@@ -48,15 +52,31 @@ SIGNAL state   : lane_state_type;
 
 signal op_v_signal  : OP_V;
 signal ld_st_signal : LOAD_STORE_FP;
+signal VSETIVLI_SIG : VSETIVLI;
 
 signal op_type      : OP_CODE;
 
 signal op_cat       : OP_CATEGORY; 
-signal ex:            crs;
 
 signal op_cat_vec   : OP_CATEGORY;
+signal VLB_FSM      : STD_LOGIC_VECTOR(63 DOWNTO 0);
+signal VLB_N        : STD_LOGIC_VECTOR(63 DOWNTO 0);
+signal VL_N         : STD_LOGIC_VECTOR(63 DOWNTO 0);
+
 
 begin
+
+  VLB_N(5 DOWNTO 1) <= VSETIVLI_SIG.UIMM;
+  VL_N(8 DOWNTO 4) <= VSETIVLI_SIG.UIMM;
+
+  VLENB_U <= VLB_N;
+  VLEN_U <= VL_N;
+
+  VSETIVLI_SIG <= (
+              ZIMM => op(29 DOWNTO 20),
+              UIMM => op(19 DOWNTO 15),
+              RD   => op(11 DOWNTO 7)
+              );
     
     op_v_signal <= (
         funct6  => op(31 downto 26),
@@ -78,7 +98,11 @@ begin
         field1  => op(11 downto 7)
     );
 
-    FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn,VLENB => VLENB, state => state);
+    with op_cat SELECT VLB_FSM <=
+      (OTHERS => '0') WHEN OPCFG,
+      VLENB WHEN OTHERS;
+
+    FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn,VLENB => VLB_FSM, state => state);
 
     with OP(6 downto 0) select op_type <=
         OP_VEC      when "1010111",
@@ -132,6 +156,10 @@ begin
 
     with op_cat select V_USE_C <=
         '1' WHEN OPMVV | OPMVX,
+        '0' WHEN OTHERS;
+
+    with op_cat SELECT WRITE_VL <=
+        '1' WHEN OPCFG,
         '0' WHEN OTHERS;
 
     with op_v_signal.funct6 SELECT ALU_OP <=

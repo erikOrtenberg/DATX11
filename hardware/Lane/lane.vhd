@@ -53,9 +53,9 @@ architecture v1 of lane is
 
   -- Control regisiternś
   signal csigs:     crs;
+  signal csigs_u:   crs;
   signal write_csr: std_logic;
   signal write_vl:  std_logic;
-  signal write_vlb: std_logic;
 
   -- Scalar register signals
 
@@ -68,6 +68,7 @@ begin
     R WHEN '0',
     mem_data_out when OTHERS;
 
+
   ctrl : entity work.control_unit_lane(ASYNC)
       generic map (
           NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
@@ -78,7 +79,8 @@ begin
           clk             => clk, 
           resetn          => resetn,
           OP              => op_code,
-          VLENB           => csigs.VLB.VLENB,
+          VLENB           => csigs.VL.VLB,
+          VLEN            => csigs.VL.VL, 
           REG_A           => regASel,
           REG_B           => regBSel,
           REG_C           => regCSel,
@@ -96,6 +98,10 @@ begin
           REGR            => regRead,
           REGW            => regWrite,
           ALU_OP          => ALU_OP,
+          VLEN_U          => csigs_u.vl.vl,
+          VLENB_U         => csigs_u.vl.vlb,
+          write_vl        => write_vl,
+
           DONE            => awaitingNewInstr
       );
 
@@ -162,8 +168,7 @@ begin
       resetn => resetn,
       write_csr => write_csr,
       write_vl => write_vl,
-      write_vlb => write_vlb,
-      update => csigs,
+      update => csigs_u,
       data => csigs
             );
 

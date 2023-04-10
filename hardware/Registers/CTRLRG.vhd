@@ -9,7 +9,6 @@ ENTITY ctrlrg IS
   resetn:       in std_logic;
   write_csr:    in std_logic;
   write_vl:     in std_logic;
-  write_vlb:    in std_logic;
   update:       in crs;
   data:         out crs);
 END ctrlrg;
@@ -24,6 +23,7 @@ begin
   PROCESS(clk,resetn)
   begin
     if(resetn = '0') then
+      report "Resetting control signals" severity note;
       state.VSTART  <= (OTHERS => (OTHERS => '0'));
       state.VXRM    <= (OTHERS => (OTHERS => '0'));
       state.VXSAT.RESERVED   <= (OTHERS => '0');
@@ -31,7 +31,7 @@ begin
       state.VCSR.vxrm    <= (OTHERS => '0');
       state.VCSR.vxsat    <= '0';
       state.VL.VL <= std_logic_vector(to_unsigned(256,64));
-      state.VLB.vlenb <= std_logic_vector(to_unsigned(32,64));
+      state.VL.VLB <= std_logic_vector(to_unsigned(32,64));
 
       state.vtype.vill <= '0';
       state.vtype.reserved <= (OTHERS => '0');
@@ -48,16 +48,12 @@ begin
       end case;
 
       CASE write_vl IS
-        when '1' => state.VL <= update.VL;
+        when '1' =>
+          report "Trying to assign VLB" severity note;
+          state.VL <= update.VL;
         when others => null;
       end case;
 
-      CASE write_vlb IS
-        when '1' => 
-          report "Trying to assign VLB" severity note;
-          state.VLB <= update.VLB;
-        when others => null;
-      end case;
     end IF;
 
     end PROCESS;

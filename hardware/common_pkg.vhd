@@ -28,6 +28,25 @@ package Common_pkg is    -- untested...
         field1      : std_logic_vector(4 downto 0);
     end record OP_V;
 
+    type VSETVLI IS RECORD
+        ZIMM        : STD_LOGIC_VECTOR(10 DOWNTO 0);
+        RS1         : STD_LOGIC_VECTOR(4  DOWNTO 0);
+        RD          : STD_LOGIC_VECTOR(4  DOWNTO 0);
+    end RECORD VSETVLI;
+
+    type VSETIVLI IS RECORD
+        ZIMM        : STD_LOGIC_VECTOR(9 DOWNTO 0);
+        UIMM        : STD_LOGIC_VECTOR(4 DOWNTO 0);
+        RD          : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    end RECORD VSETIVLI;
+
+    type VSETVL IS RECORD
+        RS2         : STD_LOGIC_VECTOR(4 DOWNTO 0);
+        RS1         : STD_LOGIC_VECTOR(4 DOWNTO 0);
+        RD          : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    end RECORD VSETVL;
+
+
     type VTYPE is RECORD
       vill:   std_logic;
       reserved: std_logic_vector(54 DOWNTO 0);
@@ -39,11 +58,8 @@ package Common_pkg is    -- untested...
     
     type vl is RECORD
       vl:   std_logic_vector(63 DOWNTO 0);
+      VLB:  std_logic_vector(63 DOWNTO 0);
     end record vl;
-    
-    type vlenb is RECORD
-      vlenb:  std_logic_vector(63 DOWNTO 0);
-    end record vlenb;
     
     type vstart is RECORD
       vstart: std_logic_vector(8 DOWNTO 0);
@@ -71,7 +87,6 @@ package Common_pkg is    -- untested...
       VXRM:   VXRM;
       VXSAT:  vxsat;
       VCSR:   vcsr;
-      VLB:    VLENB;
     end record crs;
 
 
