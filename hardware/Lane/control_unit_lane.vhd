@@ -62,11 +62,16 @@ signal op_cat_vec   : OP_CATEGORY;
 signal VLB_FSM      : STD_LOGIC_VECTOR(63 DOWNTO 0);
 signal VLB_N        : STD_LOGIC_VECTOR(63 DOWNTO 0);
 signal VL_N         : STD_LOGIC_VECTOR(63 DOWNTO 0);
+signal REGW_1       : STD_LOGIC;
 
 
 begin
 
+  VLB_N(63 DOWNTO 6) <= (OTHERS => '0');
+  VLB_N(0) <= '0';
   VLB_N(5 DOWNTO 1) <= VSETIVLI_SIG.UIMM;
+  VL_N(63 DOWNTO 9) <= (OTHERS => '0');
+  VL_N(3 DOWNTO 0) <= (OTHERS => '0');
   VL_N(8 DOWNTO 4) <= VSETIVLI_SIG.UIMM;
 
   VLENB_U <= VLB_N;
@@ -132,7 +137,11 @@ begin
 
     with state select REGW <=
         '0' when INSTR,
-        '1' when others;
+        REGW_1 when others;
+
+    with op_cat select REGW_1 <=
+        '1' when OPMVV | OPMVX,
+        '0' when OTHERS;
 
     with op_cat select REG_A <=
         op_v_signal.field2 WHEN OPMVV,
