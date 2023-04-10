@@ -42,3 +42,10 @@ På grund av misskommunikation angående möte på tentavecka blev det veckoenli
 ## LV 1
 
 Alla förutom Johannes närvarade på veckomötet. Vi har fått en ordentlig bas att jobba på med VPUn och arbetsfördelningen har förtydligats på mötet med Mateo. Nu är gruppen indelad i en Minnes/FPGA grupp och en VPU grupp. En stor insikt för VPU-gruppen var att skalärregister är ett problem. RISC-V Vector Extetionsen hänger i vanliga fall ihop med en CPU, vars skalärregister delas mellan VPUn och CPUn. I vår implementation har vi ingen sann huvud processor, så extra möda behövs läggas på att "simulera" en huvudprocessor och dess skalärregister. 
+
+## LV 2
+TODO
+
+## Påskveckan
+Varken veckomöte eller handledarmöte hölls denna vecka på grund av omtentor och frånvaro i samband med påsken.
+Erik har arbetat med simulering av minnet för load/store instruktioner. Fredrik har skrivit om kontrollenheten för att dynamiskt stödja vektorer av olika längd. Sammantaget är en fungerande produkt inte långt borta. 
