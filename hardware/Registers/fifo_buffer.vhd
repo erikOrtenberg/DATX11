@@ -34,23 +34,27 @@ signal buf : buffer_type;
 signal write_pointer : unsigned(buffer_address - 1 downto 0) := to_unsigned(0, buffer_address);
 signal read_pointer : unsigned(buffer_address - 1 downto 0) := to_unsigned(0, buffer_address);
 
+signal nr_of_elements : integer := 0;
+
 type buffer_status_type is (empty, full, other);
 signal buffer_status : buffer_status_type;
 
 begin   
-    
+    read_data <= buf(to_integer(read_pointer(buffer_address - 1 downto 0)));
     prc: process(clk)
     begin
         if(rising_edge(clk)) then
             -- conditions to read (always give the given read, but only update when data has been read)
-            read_data <= buf(to_integer(read_pointer(buffer_address - 1 downto 0)));
-            if(read_ready = '1' and buffer_status /= full) 
-                then read_pointer <= read_pointer + 1; end if;
+            if(read_ready = '1' and buffer_status /= full) then
+                nr_of_elements <= nr_of_elements - 1;
+                read_pointer <= read_pointer + 1; 
+            end if;
             
         end if;
         if(falling_edge(clk)) then
             -- conditions to write
             if(write_valid = '1' and buffer_status /= full) then        
+                nr_of_elements <= nr_of_elements + 1;
                 buf(to_integer(write_pointer(buffer_address - 1 downto 0))) <= write_data;
                 write_pointer <= write_pointer + 1;
             end if;
@@ -66,8 +70,8 @@ begin
         else '0';
 
     buffer_status <= 
-        full  when write_pointer(buffer_address - 1) /= read_pointer(buffer_address - 1) and write_pointer(buffer_address - 2 downto 0) = read_pointer(buffer_address - 2 downto 0) else
-        empty when write_pointer =  read_pointer
+        full  when nr_of_elements = 2**buffer_address else
+        empty when nr_of_elements = 0
         else other;
 
 end v1;

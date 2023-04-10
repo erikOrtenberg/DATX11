@@ -38,7 +38,7 @@ entity dummy_mem is
         data_w : integer := 64;   --data width 
         addr_w : integer := 32;   --addr width
         elements_to_fetch : integer := 4; -- basically VLEN
-        mem_init_file : string := "C:\Users\The Cube\Desktop\repos\DATX11\hardware\Memory"
+        mem_init_file : string := "C:\Users\The Cube\Desktop\repos\DATX11\hardware\Memory\memory.mif"
         );
     port (
         clk         : in std_logic;
@@ -47,8 +47,8 @@ entity dummy_mem is
         addr        : in std_logic_vector(addr_w-1 downto 0);
         data_in     : in std_logic_vector(data_w -1 downto 0);
         data_out    : out std_logic_vector(data_w-1 downto 0);
-        read_ready  : out std_logic;
-        write_ready : in std_logic;
+        --read_ready  : out std_logic;
+        --write_ready : in std_logic;
         continue    : out std_logic
         );
 end dummy_mem;
@@ -77,65 +77,96 @@ architecture v1 of dummy_mem is
 
     -- ACTUAL LOGIC
 
-    signal buf_read_data   : std_logic_vector(data_w-1 downto 0);
-    signal buf_read_valid  : std_logic;
-    signal buf_read_ready  : std_logic;
-    signal buf_write_data  : std_logic_vector(data_w-1 downto 0);
-    signal buf_write_valid : std_logic;
-    signal buf_write_ready : std_logic;
 
-    signal internal_counter : integer; 
+    signal internal_counter : integer := 0;
+    signal clock_counter    : integer := 0;
+
+    signal buf  : std_logic_vector(data_w - 1 downto 0);
 
     begin
-        buf: entity work.fifo_buffer(v1)
-        port map(
-            read_data   => buf_read_data,
-            read_valid  => buf_read_valid, 
-            read_ready  => buf_read_ready,
-            write_data  => buf_write_data,
-            write_valid => buf_write_valid,
-            write_ready => buf_write_ready,
-            clk         => clk
-        );
-        
-        read_write: process (clk, read_op, write_op)
+        continue <= '1';
+        mem: process(clk, write_op, read_op)
         begin
-            continue <= '0';
-            if(rising_edge(read_op) or rising_edge(write_op)) then
-                internal_counter <= 0;
-            end if;
             if(rising_edge(clk)) then
-                buf_read_ready  <= '0';
-                buf_write_valid <= '0';
-                if(read_op = '1') then
-                    -- reading from the internal buffer to the outside
-                    if(buf_read_valid = '1') then
-                        continue <= '1';
-                        data_out <= buf_read_data;
-                        buf_read_ready <= '1';
-                    end if;
-                    -- reading from memory to the internal buffer
-                    if(read_op = '1' and internal_counter < 4 and buf_write_ready = '1') then
-                        buf_write_data <= m_array(to_integer(unsigned(addr)) + internal_counter);
-                        buf_write_valid <= '1';
-                        internal_counter <= internal_counter + 1;
-                    end if;
-                elsif(write_op = '1') then
-                    -- write from outside to internal buffer
-                    if(buf_write_ready = '1' and write_ready = '1') then
-                        continue <= '1';
-                        buf_write_data <= data_in;
-                        buf_write_valid <= '1';
-                    end if;
-                    -- write from the internal buffer to memory
-                    if(internal_counter < 4 and buf_read_valid = '1') then
-                        m_array(to_integer(unsigned(addr)) + internal_counter) <= buf_read_data;
-                        buf_read_ready <= '1';
-                        internal_counter <= internal_counter + 1;
-                    end if;
-                end if;
+                data_out <= buf;
+            end if;
+            if(read_op = '0') then
+                buf <= (others => 'U');
+            end if;
+            if(read_op = '1' and internal_counter < 4 and rising_edge(clk)) then
+                buf <= m_array(to_integer(unsigned(addr)) + internal_counter);
+                internal_counter <= internal_counter + 1;
+            elsif(write_op = '1' and internal_counter < 4 and falling_edge(clk)) then
+                m_array(to_integer(unsigned(addr)) + internal_counter) <= data_in;
+                internal_counter <= internal_counter + 1;
+            end if;
+            if(internal_counter = 0) then
+                clock_counter <= 0;
+            elsif(rising_edge(clk)) then
+                clock_counter <= clock_counter + 1;
+            end if;
+            
+            if(rising_edge(clk) and internal_counter >= 4 and clock_counter >= 4) then
+                internal_counter <= 0;
+                clock_counter <= 0;
             end if;
         end process;
+
+
+
+
+
+
+--        continue <= i_continue;
+--        data_out <= buf_read_data;
+--        buf_write_data <= data_in;
+--        buf: entity work.fifo_buffer(v1)
+--        port map(
+--            read_data   => buf_read_data,
+--            read_valid  => buf_read_valid, 
+--            read_ready  => buf_read_ready,
+--            write_data  => buf_write_data,
+--            write_valid => buf_write_valid,
+--            write_ready => buf_write_ready,
+--            clk         => clk
+--        );
+--        
+--        outside_buffer: process (clk, buf_read_valid, buf_write_ready, read_op, write_op)
+--        begin
+--            if(read_op = '1' and internal_counter < 4 and falling_edge(clk)) then
+--                buf_write_valid <= '0';
+--                -- reading from the internal buffer to the outside
+--                if(buf_read_valid = '1') then
+--                    i_continue <= '1';
+--                    data_out <= buf_read_data;
+--                    buf_read_ready <= '1';
+--                end if;
+--                -- reading from the memory to the internal buffer 
+--                if(buf_write_ready = '1') then
+--                    buf_write_data <= m_array(to_integer(unsigned(addr)) + internal_counter);
+--                    buf_write_valid <= '1';
+--                    internal_counter <= internal_counter + 1;
+--                end if;
+--            elsif(write_op = '1' and internal_counter < 4 and rising_edge(clk)) then
+--                buf_read_ready  <= '0';
+--                -- write from outside to internal buffer
+--                if(buf_write_ready = '1') then
+--                    i_continue <= '1';
+--                    buf_write_data <= data_in;
+--                    buf_write_valid <= '1';
+--                end if;
+--                -- write from internal buffer to memory
+--                if(buf_read_valid = '1') then
+--                    m_array(to_integer(unsigned(addr)) + internal_counter) <= buf_read_data;
+--                    buf_read_ready <= '1';
+--                    internal_counter <= internal_counter + 1;
+--                end if;
+--            elsif (internal_counter >= 4) then 
+--                internal_counter <= 0;
+--                i_continue <= '0';
+--            end if;
+--        end process;
+
 end v1;
 
 

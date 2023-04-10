@@ -56,8 +56,6 @@ begin
         addr        => address,
         data_in     => data_write,
         data_out    => data_read,
-        read_ready  => i_read_ready,
-        write_ready => i_write_ready,
         continue    => continue
     );
 

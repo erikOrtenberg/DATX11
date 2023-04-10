@@ -2,22 +2,23 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity lane is
-  generic(
-      VLEN                : integer := 256;
-      bus_width           : integer := 64;
-      nr_of_reg_addr_bits : integer := 5;
-      nr_of_vectors       : integer := 32;
-      op_length           : integer := 32;
-      nr_of_mem_addr_bits : integer := 32;
-      alu_op_length       : integer := 2
-  );
-  port(
-      clk                 : in std_logic;
-      RESETN              : in std_logic;
-      op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
-done		    : out std_logic
-  --todo add ports
-  );
+    generic(
+        VLEN                : integer := 256;
+        bus_width           : integer := 64;
+        nr_of_reg_addr_bits : integer := 5;
+        nr_of_vectors       : integer := 32;
+        op_length           : integer := 32;
+        nr_of_mem_addr_bits : integer := 32;
+        alu_op_length       : integer := 2
+    );
+    port(
+        clk                 : in std_logic;
+        RESETN              : in std_logic;
+        op_code		        : in std_logic_vector(op_length-1 DOWNTO 0);
+        x_reg_in            : in std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
+        done		        : out std_logic
+    --todo add ports
+    );
 end lane;
 
 
@@ -45,7 +46,7 @@ architecture v1 of lane is
     signal awaitingNewInstr         : std_logic;
 
 
-    signal continue                 : std_logic; -- the signal which halts the entire VPU if set LOW
+    signal continue                 : std_logic; -- the signal which halts the entire VPU during if set LOW
     -- Memory signals
 
     signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
@@ -73,6 +74,7 @@ begin
             clk             => clk, 
             resetn          => resetn,
             OP              => op_code,
+            CONTINUE        => continue,
             REG_A           => regASel,
             REG_B           => regBSel,
             REG_C           => regCSel,
@@ -97,8 +99,8 @@ begin
     mem : entity work.memory_interface(v1)
         port map(
             clk             => clk,
-            address         => mem_addr,
-            data_write      => mem_data_in,
+            address         => x_reg_in,
+            data_write      => C,
             data_read       => mem_data_out,
             output_enable   => mem_read,
             write_enable    => mem_write,

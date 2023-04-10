@@ -6,7 +6,7 @@ package Common_pkg is    -- untested...
 
     type lane_state_type is (INSTR, EX1, EX2, EX3, EX4, EX5);
 
-    type OP_CODE is (LD_FP, ST_FP, OP_VEC);
+    type OP_CODE is (LD_FP, ST_FP, OP_VEC, NOP);
 
     type LOAD_STORE_FP is record
         nf          : std_logic_vector(2 downto 0);
@@ -29,6 +29,7 @@ package Common_pkg is    -- untested...
     end record OP_V;
 
     type op_category is (
+        NOP_CAT,
         VL_unit_stride, 
         VLS_strided, 
         VLX_indexed, 

@@ -13,6 +13,7 @@ ENTITY control_unit_lane IS
         resetn: IN STD_LOGIC;
 
         OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
+        CONTINUE                : IN STD_LOGIC;
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
@@ -76,6 +77,7 @@ begin
     FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn, state => state);
 
     with OP(6 downto 0) select op_type <=
+        NOP         when "0000000",
         OP_VEC      when "1010111",
         LD_FP       when "0000111",
         ST_FP       when others; -- "0100111";
@@ -123,8 +125,9 @@ begin
             REG_C   <= (others => '0');
             ALU_OP  <= (others => '0');
         else 
-            advance <= '1';
+            advance <= continue;
             case op_type is
+                when NOP => op_cat <= NOP_CAT;
                 when OP_VEC =>
                     case op_v_signal.funct3 is
                         when "000"  => op_cat <= OPIVV;
@@ -158,15 +161,20 @@ begin
             X_USE_A <= '0';
             X_USE_B <= '0';
             X_USE_C <= '0';
+            MEM_READ    <= '0';
+            MEM_WRITE   <= '0';
 
             case op_cat is
+                when NOP_CAT =>
+                    advance <= '0';
                 -- macc funct6 = "101101"
                 when VL_unit_stride => -- Todo
                     case ld_st_signal.field3 is
                         when "00000" => null; -- unit-stride load
 
-                        when "01000" => null; -- unit-stride, whole register load
-                        
+                        when "01000" =>  -- unit-stride, whole register load
+                            MEM_READ <= '1';
+                            REG_C <= ld_st_signal.field1;
                         when "01011" => null; -- unit-stride, mask load, EEW=8
                         
                         when "10000" => null; -- unit-stride fault-only-first
@@ -180,7 +188,9 @@ begin
                         when "00000" => null; -- unit-stride store
 
                         when "01000" => null; -- unit-stride, whole register store
-                        
+                            MEM_WRITE <= '1';
+                            V_USE_C <= '1';
+                            REG_C <= ld_st_signal.field1;
                         when "01011" => null; -- unit-stride, mask store, EEW=8
                         
                         when others  => null; 
