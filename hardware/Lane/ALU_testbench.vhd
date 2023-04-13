@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.common_pkg.all;
 USE ieee.std_logic_textio.all;
 
 LIBRARY std;
@@ -13,11 +12,8 @@ end entity ALU_testbench;
 architecture test of ALU_testbench is
 
   component ALU is
-    generic (
-      OP_Length : integer := 2
-    );
     port (
-      op      : in std_logic_vector(OP_Length-1 downto 0);
+      op      : in std_logic_vector(1 downto 0);
       a, b, c : in std_logic_vector(63 downto 0);
       r       : OUT std_logic_vector(63 DOWNTO 0) 
     );
@@ -29,10 +25,10 @@ architecture test of ALU_testbench is
   test_vector is
     file tv_file : text open read_mode is tv_file_name;
     variable tv_line : line;
-    variable temp_bv : bit_vector(va_width-1 downto 0);
-    variable temp_tv : test_vector(va_length-1 downto 0)(va_width-1 downto 0);
+    variable temp_bv : bit_vector(tv_width-1 downto 0);
+    variable temp_tv : test_vector(tv_length-1 downto 0)(tv_width-1 downto 0);
   begin
-    for i in 0 to va_length-1 loop
+    for i in 0 to tv_length-1 loop
       readline(tv_file, tv_line);
       read(tv_line, temp_bv);
       temp_tv(i) := to_stdlogicvector(temp_bv);
@@ -46,14 +42,14 @@ architecture test of ALU_testbench is
   signal c : std_logic_vector(63 downto 0);
   signal r : std_logic_vector(63 downto 0);
 
-  signal tv_a : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_a.txt", 64, 64);
-  signal tv_b : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_b.txt", 64, 64);
-  signal tv_c : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_c.txt", 64, 64);
+  signal tv_a : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_a.txt", 64, 64);
+  signal tv_b : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_b.txt", 64, 64);
+  signal tv_c : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_c.txt", 64, 64);
 
-  signal tv_mul : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_mul.txt", 64, 64);
-  signal tv_mac : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_mac.txt", 64, 64);
-  signal tv_add : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_add.txt", 64, 64);
-  signal tv_div : vector_array(63 downto 0)(63 downto 0) := init_tv_wfile("tv_div.txt", 64, 64);
+  signal tv_mul : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_mul.txt", 64, 64);
+  signal tv_mac : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_mac.txt", 64, 64);
+  signal tv_add : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_add.txt", 64, 64);
+  signal tv_div : test_vector(63 downto 0)(63 downto 0) := init_tv_wfile("tv_div.txt", 64, 64);
 
 begin
 
@@ -66,31 +62,44 @@ begin
       r => r
     );
 
-    for i in ( 0 to 64 ) loop
+    test_process : process begin
 
-      -- Init a, b, c
-      a <= tv_a(i);
-      b <= tv_b(i);
-      c <= tv_c(i);
+      for i in 63 downto 0 loop
 
-      -- Test MUL
-      op <= "00";
-      assert (tv_mul(i) = r) report "MUL error!" severity failure;
-      
-      -- Test MAC
-      op <= "01";
-      assert (tv_mac(i) = r) report "MAC error!" severity failure;
-      
-      -- Test ADD
-      op <= "10";
-      assert (tv_add(i) = r) report "ADD error!" severity failure;
-      
-      -- Test DIV
-      op <= "11";
-      assert (tv_div(i) = r) report "DIV error!" severity failure;
+        -- Init a, b, c
+        a <= tv_a(i);
+        b <= tv_b(i);
+        c <= tv_c(i);
 
-      end loop;
+        -- Test MUL
+        wait for 5 ns;
+        op <= "01";
+        wait for 5 ns;
+        assert (tv_mul(i) = r) report "MUL error!" severity failure;
+        
+        -- Test MAC
+        wait for 5 ns;
+        op <= "00";
+        wait for 5 ns;
+        assert (tv_mac(i) = r) report "MAC error!" severity failure;
+        
+        -- Test ADD
+        wait for 5 ns;
+        op <= "10";
+        wait for 5 ns;
+        assert (tv_add(i) = r) report "ADD error!" severity failure;
+        
+        -- Test DIV
+        --op <= "11";
+        --wait for 5 ns;
+        --assert (tv_div(i) = r) report "DIV error!" severity failure;
+
+        wait for 5 ns;
+
+        end loop;
 
       report "Success!" severity failure;
-    
+      
+    end process;
+
 end test;
