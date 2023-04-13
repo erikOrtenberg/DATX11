@@ -5,3 +5,4 @@ hardware/work/
 *.vstf
 /hardware/transcript
 _info
+vpu_v1/*
