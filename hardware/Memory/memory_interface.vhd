@@ -39,15 +39,10 @@ end memory_interface;
 
 architecture v1 of memory_interface is
 
-    -- shows if the memory module is ready to output an element
-    signal i_read_ready : std_logic;
-    -- tells the memory module if the data_in should be added 
-    -- to the internal buffer in next clk cycle 
-    signal i_write_ready : std_logic;
+    signal buffer_read_data :std_logic_vector(data_w - 1 downto 0);
 
 begin
-    -- initialize output signal valid = 0;
-    -- instantiate memory module
+
     memory: entity work.dummy_mem(v1)
     port map(
         clk         => clk,
@@ -58,7 +53,5 @@ begin
         data_out    => data_read,
         continue    => continue
     );
-
-
 
 end v1 ; -- memory_interface
