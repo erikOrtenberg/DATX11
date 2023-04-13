@@ -38,7 +38,7 @@ entity dummy_mem is
         data_w : integer := 64;   --data width 
         addr_w : integer := 32;   --addr width
         elements_to_fetch : integer := 4; -- basically VLEN
-        mem_init_file : string := "C:\Users\The Cube\Desktop\repos\DATX11\hardware\Memory\memory.mif"
+        mem_init_file : string := "/home/kryddan/repos/DATX11/hardware/Memory/memory.mif"
         );
     port (
         clk         : in std_logic;
@@ -81,35 +81,31 @@ architecture v1 of dummy_mem is
     signal internal_counter : integer := 0;
     signal clock_counter    : integer := 0;
 
-    signal buf  : std_logic_vector(data_w - 1 downto 0);
 
     begin
         continue <= '1';
         mem: process(clk, write_op, read_op)
         begin
-            if(rising_edge(clk)) then
-                data_out <= buf;
-            end if;
             if(read_op = '0') then
-                buf <= (others => 'U');
+                data_out <= (others => 'U');
             end if;
-            if(read_op = '1' and internal_counter < 4 and rising_edge(clk)) then
-                buf <= m_array(to_integer(unsigned(addr)) + internal_counter);
-                internal_counter <= internal_counter + 1;
-            elsif(write_op = '1' and internal_counter < 4 and falling_edge(clk)) then
-                m_array(to_integer(unsigned(addr)) + internal_counter) <= data_in;
-                internal_counter <= internal_counter + 1;
+            if(falling_edge(clk)) then
+                if(read_op = '1' and internal_counter < 4) then
+                    data_out <= m_array(to_integer(unsigned(addr)) + internal_counter);
+                    internal_counter <= internal_counter + 1;
+                elsif(write_op = '1' and internal_counter < 4) then
+                    m_array(to_integer(unsigned(addr)) + internal_counter) <= data_in;
+                    internal_counter <= internal_counter + 1;
+                end if;
             end if;
-            if(internal_counter = 0) then
-                clock_counter <= 0;
-            elsif(rising_edge(clk)) then
-                clock_counter <= clock_counter + 1;
+            if(rising_edge(clk) and internal_counter >= 4) then
+                internal_counter <= 0;
             end if;
             
-            if(rising_edge(clk) and internal_counter >= 4 and clock_counter >= 4) then
-                internal_counter <= 0;
-                clock_counter <= 0;
-            end if;
+            -- if(rising_edge(clk) and internal_counter >= 4 and clock_counter >= 4) then
+            --     internal_counter <= 0;
+            --     clock_counter <= 0;
+            -- end if;
         end process;
 
 

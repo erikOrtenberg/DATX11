@@ -27,10 +27,10 @@ component add64 is
 end component;
 
 
-component div64 is
-    port (a,b: in std_logic_vector(63 downto 0);
-    r : out std_logic_vector(63 downto 0));
-end component;
+--component div64 is
+--    port (a,b: in std_logic_vector(63 downto 0);
+--    r : out std_logic_vector(63 downto 0));
+--end component;
  
 signal RMAC,RADD,RMUL,RDIV : std_logic_vector(63 downto 0);
 signal MAC_OPC : std_logic_vector(63 downto 0);
@@ -43,11 +43,11 @@ begin
     
     macc: macc64 port map(A,B,C,RMAC);
     add: add64 port map(A,B,RADD);
-    div: div64 port map(A,B,RDIV);
+    --div: div64 port map(A,B,RDIV);
     
     with OP(1 downto 0) select R <=
       RADD WHEN "10",
-      RDIV WHEN "11", 
+      --RDIV WHEN "11", 
       RMAC WHEN OTHERS;
 
 end architecture ; -- arch

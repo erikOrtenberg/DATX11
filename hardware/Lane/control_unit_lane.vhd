@@ -16,7 +16,6 @@ ENTITY control_unit_lane IS
         CONTINUE                : IN STD_LOGIC;
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
-        X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
         MEM_READ,MEM_WRITE      : OUT STD_LOGIC;
         WB_WRITE_ENABLE         : OUT STD_LOGIC;
         -- Add write enable signals to block when reading/writing to memory
@@ -74,7 +73,7 @@ begin
         field1  => op(11 downto 7)
     );
 
-    FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn, state => state);
+    --FSM1 : lane_fsm port map (advance => advance, clk => clk, resetn => resetn, state => state);
 
     with OP(6 downto 0) select op_type <=
         NOP         when "0000000",
@@ -103,29 +102,50 @@ begin
         '0' when EX5 | INSTR,
         '1' when others;
 
-    with state select REGW <=
-        '0' when INSTR | EX1,
-        '1' when others;
+    --op_categoryzation: process(op_type)
+    --begin
+        
+    --end process;
 
-    reg_select: process(op_type, clk, resetn)
+
+    fsm: process(clk, resetn, advance)
     begin
-        if(resetn = '0') then 
+        -- FSM
+        if(resetn = '0') then
+            state <= INSTR;
+        elsif(rising_edge(clk)) then
+            case state is
+                when INSTR => if advance = '1' then 
+                        state <= EX1; 
+                    else state <= INSTR; 
+                    end if;
+                when EX1  => state <= EX2;
+                when EX2  => state <= EX3;
+                when EX3  => state <= EX4; 
+                when EX4  => state <= EX5;
+                when EX5  => state <= INSTR;
+            end case;
+        end if;
+    end process;
+
+    reg_select: process(op_type, clk, resetn, state)
+    begin
+        if(resetn = '0') then
             advance <= '0';
             mem_read <= '0';
             mem_write <= '0';
             V_USE_A <= '0';
             V_USE_B <= '0';
             V_USE_C <= '0';
-            X_USE_A <= '0';
-            X_USE_B <= '0';
-            X_USE_C <= '0';
             WB_WRITE_ENABLE <= '0';
             REG_A   <= (others => '0');
             REG_B   <= (others => '0');
             REG_C   <= (others => '0');
             ALU_OP  <= (others => '0');
         else 
+
             advance <= continue;
+            -- OP CATEGORIZATION
             case op_type is
                 when NOP => op_cat <= NOP_CAT;
                 when OP_VEC =>
@@ -155,15 +175,35 @@ begin
                     end case;
             end case;
 
+
+
+
+
+            -- RESET SIGNALS
             V_USE_A <= '0';
             V_USE_B <= '0';
             V_USE_C <= '0';
-            X_USE_A <= '0';
-            X_USE_B <= '0';
-            X_USE_C <= '0';
+            --X_USE_A <= '0';
+            --X_USE_B <= '0';
+            --X_USE_C <= '0';
             MEM_READ    <= '0';
             MEM_WRITE   <= '0';
+            WB_WRITE_ENABLE <= '0';
 
+            -- REGW CONTROL
+
+            case state is
+                when EX2 | EX3 | EX4 | EX5 => 
+                    if(op_cat /= VS_unit_stride) then
+                        REGW <= '1';
+                    else
+                        REGW <= '0';
+                    end if;
+                when others =>
+                    REGW <= '0';
+            end case;
+
+            -- EXECUTE BASED ON CATEGORY
             case op_cat is
                 when NOP_CAT =>
                     advance <= '0';
@@ -173,7 +213,13 @@ begin
                         when "00000" => null; -- unit-stride load
 
                         when "01000" =>  -- unit-stride, whole register load
-                            MEM_READ <= '1';
+                            case state is 
+                                when EX1 | EX2 | EX3 | EX4 =>
+                                    WB_WRITE_ENABLE <= '1';
+                                    MEM_READ <= '1';
+                                when others =>
+                                    MEM_READ <= '0';
+                            end case;
                             REG_C <= ld_st_signal.field1;
                         when "01011" => null; -- unit-stride, mask load, EEW=8
                         
@@ -188,7 +234,12 @@ begin
                         when "00000" => null; -- unit-stride store
 
                         when "01000" => null; -- unit-stride, whole register store
-                            MEM_WRITE <= '1';
+                            case state is 
+                                when EX2 | EX3 | EX4 | EX5 =>
+                                    MEM_WRITE <= '1';
+                                when others =>
+                                    MEM_WRITE <= '0';
+                            end case;
                             V_USE_C <= '1';
                             REG_C <= ld_st_signal.field1;
                         when "01011" => null; -- unit-stride, mask store, EEW=8
@@ -204,6 +255,7 @@ begin
 
                     -- Register setup
 
+                    WB_WRITE_ENABLE <= '1';
                     REG_A <= op_v_signal.field2;
                     REG_B <= op_v_signal.field3;
                     REG_C <= op_v_signal.field1;
@@ -211,8 +263,8 @@ begin
                 
                     if(op_cat = OPMVV) then
                         V_USE_A <= '1'; -- A depends on category
-                    else
-                        X_USE_A <= '1';
+                    --else
+                        --X_USE_A <= '1';
                     end if;
 
                     -- C depends on instruction

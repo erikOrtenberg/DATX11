@@ -27,7 +27,7 @@ architecture test of lane_testbench is
     signal op_code, x_reg_in : std_logic_vector(31 downto 0);
     signal expected: std_logic_vector(63 DOWNTO 0);
     signal done: std_logic;
-   -- FILE vectorFile: TEXT OPEN READ_MODE is "C:\Users\The Cube\Desktop\repos\DATX11\vectorfile.txt";
+    FILE vectorFile: TEXT OPEN READ_MODE is "/home/kryddan/repos/DATX11/vectorfile.txt";
 
 
 
@@ -104,8 +104,8 @@ begin
 --    wait on done;
 --    op_code <= "00000000000000000000000000000000";
 --   end LOOP;
---       
---    
+       
+    
     test: process
     begin
 
@@ -113,6 +113,9 @@ begin
     wait for 10 ns;
     resetn <= '1';
 
+
+    -- load unit-stride from address 0x0 to vector register 4
+    -- vle8.v VR(4) (0x0)  
     x_reg_in <= "00000000000000000000000000000000";
 
     op_code <= "00000000100000000000001000000111";
@@ -120,23 +123,34 @@ begin
     wait on done;
     op_code <= "00000000000000000000000000000000";
 
-
-    wait for 40 ns;
-
+    -- load unit-stride from address 0x4 to vector register 2 
+    -- vle8.v VR(2) (0x4)
     x_reg_in <= "00000000000000000000000000000100";
 
     op_code <= "00000000100000000000000100000111";
     wait on done;
     wait on done;
     op_code <= "00000000000000000000000000000000";
-    wait for 100 ns;
+    --wait for 100 ns;
+
     
+    -- store unit stride from vector register 4 to address 0x0
     x_reg_in <= "00000000000000000000000000000000";
 
     op_code <= "00000000100000000000000100100111";
     wait on done;
     wait on done;
     op_code <= "00000000000000000000000000000000";
+    
+    
+    -- store unit stride from vector register 2 to address 0x4
+    x_reg_in <= "00000000000000000000000000000100";
+
+    op_code <= "00000000100000000000001000100111";
+    wait on done;
+    wait on done;
+    op_code <= "00000000000000000000000000000000";
+    
     wait for 100 ns;
 
 

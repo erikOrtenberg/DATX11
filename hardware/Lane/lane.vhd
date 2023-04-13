@@ -60,9 +60,15 @@ architecture v1 of lane is
     --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
-    WITH mem_read SELECT wb_register <=
-        R WHEN '0',
-        mem_data_out when OTHERS;
+    wb: process(clk)
+    begin
+        if(rising_edge(clk) and wb_writeEnable = '1') then
+            case mem_read is
+                when '1'    => wb_register <= mem_data_out;
+                when others => wb_register <= R;
+            end case;
+        end if;
+    end process; 
 
     ctrl : entity work.control_unit_lane(v1)
         generic map (
@@ -81,9 +87,9 @@ begin
             V_USE_A         => v_use_a,
             V_USE_B         => v_use_b,
             V_USE_C         => v_use_c,
-            X_USE_A         => x_use_a,
-            X_USE_B         => x_use_b,
-            X_USE_C         => x_use_c,
+            --X_USE_A         => x_use_a,
+            --X_USE_B         => x_use_b,
+            --X_USE_C         => x_use_c,
             WB_WRITE_ENABLE => wb_writeEnable,
             MEM_READ        => mem_read,
             MEM_WRITE       => mem_write,
@@ -95,17 +101,17 @@ begin
             DONE            => awaitingNewInstr
         );
 
-  -- mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
-    mem : entity work.memory_interface(v1)
-        port map(
-            clk             => clk,
-            address         => x_reg_in,
-            data_write      => C,
-            data_read       => mem_data_out,
-            output_enable   => mem_read,
-            write_enable    => mem_write,
-            continue        => continue
-          );
+        --mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
+         mem : entity work.memory_interface(v1)
+             port map(
+                 clk             => clk,
+                 address         => x_reg_in,
+                 data_write      => C,
+                 data_read       => mem_data_out,
+                 output_enable   => mem_read,
+                 write_enable    => mem_write,
+                 continue        => continue
+               );
 
   -- Shouldn't be in the VPU
   --xreg : entity work.x_register_file(v1)
