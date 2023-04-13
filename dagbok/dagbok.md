@@ -42,3 +42,7 @@ På grund av misskommunikation angående möte på tentavecka blev det veckoenli
 ## LV 1
 
 Alla förutom Johannes närvarade på veckomötet. Vi har fått en ordentlig bas att jobba på med VPUn och arbetsfördelningen har förtydligats på mötet med Mateo. Nu är gruppen indelad i en Minnes/FPGA grupp och en VPU grupp. En stor insikt för VPU-gruppen var att skalärregister är ett problem. RISC-V Vector Extetionsen hänger i vanliga fall ihop med en CPU, vars skalärregister delas mellan VPUn och CPUn. I vår implementation har vi ingen sann huvud processor, så extra möda behövs läggas på att "simulera" en huvudprocessor och dess skalärregister. 
+
+## LV 2
+
+Alla närvarade på mötet. Gruppen satte som mål att få saker att laddas upp på FPGAn, fixa ett blockdiagram för HAn, och att få MAC funktionen att funka med flera värden i rad. Under veckan jobbade gruppen vidare på lanen genom tester till ALUn, kontrollregister, loads och stores för minnet. Mjukvarugruppen höll också på med att försöka få python och GPIO att fungera med FPGAn. Gruppen hade sedan individuella möten med handledaren för att checka av hur det gick för varje enkild person.
