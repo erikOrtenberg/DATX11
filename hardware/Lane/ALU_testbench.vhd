@@ -40,7 +40,7 @@ architecture test of ALU_testbench is
     return temp_tv;
   end function;
 
-  signal op : std_logic_vector(1 downto 0);
+  signal op : std_logic_vector(1 downto 0) := "00";
   signal a : std_logic_vector(63 downto 0);
   signal b : std_logic_vector(63 downto 0);
   signal c : std_logic_vector(63 downto 0);
