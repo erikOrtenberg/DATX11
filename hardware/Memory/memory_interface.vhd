@@ -33,7 +33,7 @@ entity memory_interface is
         data_read       : out std_logic_vector (data_w - 1 downto 0);
         output_enable   : in std_logic;
         write_enable    : in std_logic;
-        continue        : out std_logic
+        mem_ready       : out std_logic
     );
 end memory_interface;
 
@@ -51,7 +51,7 @@ begin
         addr        => address,
         data_in     => data_write,
         data_out    => data_read,
-        continue    => continue
+        mem_ready    => mem_ready
     );
 
 end v1 ; -- memory_interface

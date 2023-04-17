@@ -49,7 +49,7 @@ entity dummy_mem is
         data_out    : out std_logic_vector(data_w-1 downto 0);
         --read_ready  : out std_logic;
         --write_ready : in std_logic;
-        continue    : out std_logic
+        mem_ready    : out std_logic
         );
 end dummy_mem;
 
@@ -79,12 +79,10 @@ architecture v1 of dummy_mem is
 
 
     signal internal_counter : integer := 0;
-    signal clock_counter    : integer := 0;
-
 
     begin
-        continue <= '1';
-        mem: process(clk, write_op, read_op)
+        mem_ready <= '1';
+        mem: process(clk, write_op, read_op, internal_counter, addr)
         begin
             if(read_op = '0') then
                 data_out <= (others => 'U');

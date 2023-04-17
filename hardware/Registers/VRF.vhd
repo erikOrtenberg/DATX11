@@ -15,9 +15,9 @@ entity v_register_file is
         outA               : out std_logic_vector(bus_width - 1 downto 0);                    -- Output signals for selected registers 
         outB               : out std_logic_vector(bus_width - 1 downto 0);
         outC               : out std_logic_vector(bus_width - 1 downto 0);
-        outA_OE            : in std_logic;
-        outB_OE            : in std_logic;
-        outC_OE            : in std_logic;
+        --outA_OE            : in std_logic;
+        --outB_OE            : in std_logic;
+        --outC_OE            : in std_logic;
         dataIn             : in std_logic_vector(bus_width - 1 downto 0);                    -- Input value to one register of one vector 
         writeEnable        : in std_logic;                                                     -- Enables writing the input to selected register and vector
         regASel            : in std_logic_vector(nr_of_addr_bits - 1 downto 0);                  -- Select which vector registers to output 
@@ -37,29 +37,15 @@ type registerFile is array(0 to nr_of_vectors - 1) of vector_register;
 signal registers : registerFile;
 
 begin
-    regFile: process(clk, resetn)
+    regFile: process(clk, resetn, readRegSel, writeRegSel, regASel, regBSel, regCSel)
     begin
         if(resetn = '0') then
             registers <= (others => (others => (others => '0')));
         else
             if(rising_edge(clk)) then
-                if(outA_OE = '1') then
-                    outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
-                else 
-                    outA <= (others => 'U');
-                end if;
-                
-                if(outB_OE = '1') then
-                    outB <= registers(to_integer(unsigned(regBSel)))(to_integer(unsigned(readRegSel)));
-                else 
-                    outB <= (others => 'U');
-                end if;
-
-                if(outC_OE = '1') then
-                    outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
-                else 
-                    outC <= (others => 'U');
-                end if;
+                outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
+                outB <= registers(to_integer(unsigned(regBSel)))(to_integer(unsigned(readRegSel)));
+                outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
             end if;
             if(falling_edge(clk)) then
                 if(writeEnable = '1') then

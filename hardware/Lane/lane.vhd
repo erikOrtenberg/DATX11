@@ -13,7 +13,7 @@ entity lane is
     );
     port(
         clk                 : in std_logic;
-        RESETN              : in std_logic;
+        resetn              : in std_logic;
         op_code		        : in std_logic_vector(op_length-1 DOWNTO 0);
         x_reg_in            : in std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
         done		        : out std_logic
@@ -46,7 +46,7 @@ architecture v1 of lane is
     signal awaitingNewInstr         : std_logic;
 
 
-    signal continue                 : std_logic; -- the signal which halts the entire VPU during if set LOW
+    signal mem_ready                 : std_logic; -- the signal which halts the entire VPU during if set LOW
     -- Memory signals
 
     signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
@@ -60,7 +60,7 @@ architecture v1 of lane is
     --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
-    wb: process(clk)
+    wb: process(clk, wb_writeEnable)
     begin
         if(rising_edge(clk) and wb_writeEnable = '1') then
             case mem_read is
@@ -80,7 +80,7 @@ begin
             clk             => clk, 
             resetn          => resetn,
             OP              => op_code,
-            CONTINUE        => continue,
+            mem_ready       => mem_ready,
             REG_A           => regASel,
             REG_B           => regBSel,
             REG_C           => regCSel,
@@ -95,7 +95,7 @@ begin
             MEM_WRITE       => mem_write,
             REGR_IDX        => readRegSel,
             REGW_IDX        => writeRegSel,
-            REGR            => regRead,
+            --REGR            => regRead,
             REGW            => regWrite,
             ALU_OP          => ALU_OP,
             DONE            => awaitingNewInstr
@@ -110,7 +110,7 @@ begin
                  data_read       => mem_data_out,
                  output_enable   => mem_read,
                  write_enable    => mem_write,
-                 continue        => continue
+                 mem_ready       => mem_ready
                );
 
   -- Shouldn't be in the VPU
@@ -145,9 +145,9 @@ begin
             outA        => A, 
             outB        => B, 
             outC        => C,
-            outA_OE     => v_use_a, 
-            outB_OE     => v_use_b, 
-            outC_OE     => v_use_c, 
+            --outA_OE     => v_use_a, 
+            --outB_OE     => v_use_b, 
+            --outC_OE     => v_use_c, 
             dataIn      => wb_register,
             regASel     => regASel, 
             regBSel     => regBSel, 
@@ -161,11 +161,13 @@ begin
 
     alu0: entity work.ALU(v1)
         port map(
-            A=>A, 
-            B=>B, 
-            C=>C, 
-            R=>R, 
-            op=>ALU_OP
+            A       =>A, 
+            B       =>B, 
+            C       =>C,
+            X       =>x_reg_in, 
+            R       =>R, 
+            op      =>ALU_OP,
+            use_v   =>v_use_a
         );
 
 --  reset : process(mem_read, resetn, clk)
