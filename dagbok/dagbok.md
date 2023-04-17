@@ -48,4 +48,7 @@ Alla närvarade på mötet. Gruppen satte som mål att få saker att laddas upp 
 
 ## Påskveckan
 Varken veckomöte eller handledarmöte hölls denna vecka på grund av omtentor och frånvaro i samband med påsken.
-Erik har arbetat med simulering av minnet för load/store instruktioner. Fredrik har skrivit om kontrollenheten för att dynamiskt stödja vektorer av olika längd. Sammantaget är en fungerande produkt inte långt borta. 
+Erik har arbetat med simulering av minnet för load/store instruktioner. Fredrik har skrivit om kontrollenheten för att dynamiskt stödja vektorer av olika längd. Sammantaget är en fungerande produkt inte långt borta.
+
+## LV3
+Denna vecka har vi hållt veckomöte och handledarmöte. Erik har bråkat med Vivado när han försökt syntetisera VPUn. Sofia har arbetat på rapporten. Johannes har strukturerat upp rapporten och sketchat upp slutgiltigt upplägg samt skrivit klart punkter. Fredrik har skrivit diskussion och om numeriska format men blev sedan sjuk och trött :(.Adam har fortsatt skriva en testkrets för att köra DMA och GP samtidigt.
