@@ -16,6 +16,7 @@ entity lane is
         resetn              : in std_logic;
         op_code		        : in std_logic_vector(op_length-1 DOWNTO 0);
         x_reg_in            : in std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
+        TEST_mem_data       : out std_logic;
         done		        : out std_logic
     --todo add ports
     );
@@ -59,6 +60,9 @@ architecture v1 of lane is
     --signal x_writeEnable            : std_logic;
     --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
+
+    TEST_mem_data <= and mem_data_out;
+
 
     wb: process(clk, wb_writeEnable)
     begin
