@@ -16,6 +16,7 @@ entity lane is
       clk                 : in std_logic;
       RESETN              : in std_logic;
       op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
+      x_reg_in      : in std_logic_vector(nr_of_mem_addr_bits-1   DOWNTO 0);
       done		    : out std_logic
   --todo add ports
   );
@@ -45,6 +46,8 @@ architecture v1 of lane is
   signal regWrite                 : std_logic;
   signal awaitingNewInstr         : std_logic;
 
+  signal mem_ready                : std_logic;
+
   -- Memory signals
 
   signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
@@ -64,12 +67,21 @@ architecture v1 of lane is
   --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
-  WITH mem_read SELECT wb_register <=
-    R WHEN '0',
-    mem_data_out when OTHERS;
+  -- wb: process(clk)
+  -- begin
+  --     if(rising_edge(clk) and wb_writeEnable = '1') then
+  --         case mem_read is
+  --             when '1'    => wb_register <= mem_data_out;
+  --             when others => wb_register <= R;
+  --         end case;
+  --     end if;
+  -- end process;
 
+  with mem_read SELECT wb_register <=
+      R when '0',
+      mem_data_out when OTHERS;
 
-  ctrl : entity work.control_unit_lane(ASYNC)
+  ctrl : entity work.control_unit_lane(v2)
       generic map (
           NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
           OP_LENGTH       => op_length,
@@ -101,19 +113,21 @@ begin
           VLEN_U          => csigs_u.vl.vl,
           VLENB_U         => csigs_u.vl.vlb,
           write_vl        => write_vl,
+          continue        => mem_ready,
 
           DONE            => awaitingNewInstr
       );
 
-  -- mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
-  mem : entity work.dummy_mem(v1)
+  -- mem_ahttps://raw.githubusercontent.com/erikOrtenberg/DATX11/ft_sim_mem/hardware/Memory/dummy_memory.vhdddr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
+  mem : entity work.memory_interface(v1)
       port map(
           clk         => clk,
-          m_read      => mem_read,
-          m_write     => mem_write,
-          m_addr      => mem_addr,
-          data_in     => mem_data_in,
-          data_out    => mem_data_out
+          address         => x_reg_in,
+          data_write      => C,
+          data_read       => mem_data_out,
+          output_enable   => mem_read,
+          write_enable    => mem_write,
+          mem_ready       => mem_ready
       );
 
   -- Shouldn't be in the VPU
@@ -178,6 +192,8 @@ begin
           B=>B, 
           C=>C, 
           R=>R, 
+          X => x_reg_in,
+          use_v => v_use_a,
           op=>ALU_OP
       );
 

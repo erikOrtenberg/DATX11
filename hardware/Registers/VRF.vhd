@@ -41,7 +41,7 @@ begin
         if(resetn = '0') then
             registers <= (others => (others => (others => '0')));
         else
-            if(falling_edge(clk)) then
+            if(rising_edge(clk)) then
                 if(outA_OE = '1') then
                     outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
                 else 
@@ -59,8 +59,6 @@ begin
                 else 
                     outC <= (others => 'U');
                 end if;
-            end if;
-            if(rising_edge(clk)) then
                 if(writeEnable = '1') then
                     registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= dataIn;
                 end if;
