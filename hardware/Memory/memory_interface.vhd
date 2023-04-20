@@ -43,7 +43,7 @@ architecture v1 of memory_interface is
 
 begin
 
-    memory: entity work.dummy_mem(v1)
+    memory: entity work.dummy_mem(v2)
     port map(
         clk         => clk,
         read_op     => output_enable,

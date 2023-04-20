@@ -30,6 +30,7 @@ ENTITY control_unit_lane IS
         VLENB_U                 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
         VLEN_U                  : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
         WRITE_VL                 : OUT STD_LOGIC;
+        mem_offset              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         DONE                    : OUT STD_LOGIC
     );
 end control_unit_lane;
@@ -115,31 +116,20 @@ begin
         '1' when others;
 
     with op_cat SELECT REGW <= 
-        REGW_1 WHEN OPMVV | OPMVX,
+        REGW_1 WHEN OPMVV | OPMVX | VL_unit_stride,
         '0' WHEN OTHERS;
 
-    reg_select: process(clk, resetn)
+    mem_offset <= num_ex(34 DOWNTO 3);
+    update_state: process(clk, resetn)
     begin
         if(resetn = '0') then 
             advance <= '0';
-            mem_read <= '0';
-            mem_write <= '0';
-            V_USE_A <= '0';
-            V_USE_B <= '0';
-            V_USE_C <= '0';
-            X_USE_A <= '0';
-            X_USE_B <= '0';
-            X_USE_C <= '0';
-            WB_WRITE_ENABLE <= '0';
-            REG_A   <= (others => '0');
-            REG_B   <= (others => '0');
-            REG_C   <= (others => '0');
-            ALU_OP  <= (others => '0');
             state   <= INSTR;
         elsif(falling_edge(clk)) then -- FSM, execute the correct number of states
             advance <= continue;
-            
-            if(op_cat = OPMVV or op_cat = OPMVX) then
+            prev_state <= state;
+            case op_cat is
+              when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
                 if(unsigned(VLENB) > unsigned(num_ex)) THEN
                   CASE state IS
                     when INSTR  =>
@@ -163,10 +153,10 @@ begin
                   state <= INSTR;
                   num_ex <= (OTHERS => '0');
                 end if;
-            else
+            when OTHERS =>
               state <= INSTR;
               num_ex <= (OTHERS => '0');
-            end if;
+            end case;
 
             case op_type is
                 when NOP => op_cat <= NOP_CAT;
@@ -196,7 +186,26 @@ begin
                         when others => op_cat <= VSX_indexed;
                     end case;
             end case;
+        end if;
+    end process;
 
+    control_signals: process(state,resetn)
+    begin
+        if(resetn = '0') then
+            mem_read <= '0';
+            mem_write <= '0';
+            V_USE_A <= '0';
+            V_USE_B <= '0';
+            V_USE_C <= '0';
+            X_USE_A <= '0';
+            X_USE_B <= '0';
+            X_USE_C <= '0';
+            WB_WRITE_ENABLE <= '0';
+            REG_A   <= (others => '0');
+            REG_B   <= (others => '0');
+            REG_C   <= (others => '0');
+            ALU_OP  <= (others => '0');
+        else
 
             V_USE_A <= '0';
             V_USE_B <= '0';
@@ -209,7 +218,7 @@ begin
 
             case op_cat is
                 when NOP_CAT =>
-                    advance <= '0';
+                    -- advance <= '0';
                 -- macc funct6 = "101101"
                 when VL_unit_stride => -- Todo
                     case ld_st_signal.field3 is
@@ -297,7 +306,6 @@ begin
                         
                 when others => null;
             end case;
-            prev_state <= state;
         end if;
     end process; 
 end v2;

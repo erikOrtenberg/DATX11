@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.ALL;
 use work.common_pkg.all;
 
 entity lane is
@@ -47,6 +48,8 @@ architecture v1 of lane is
   signal awaitingNewInstr         : std_logic;
 
   signal mem_ready                : std_logic;
+  signal x_reg_buf                : std_logic_vector(nr_of_mem_addr_bits-1 DOWNTO 0);
+  signal mem_offset               : std_logic_vector(31 DOWNTO 0);
 
   -- Memory signals
 
@@ -114,6 +117,7 @@ begin
           VLENB_U         => csigs_u.vl.vlb,
           write_vl        => write_vl,
           continue        => mem_ready,
+          mem_offset      => mem_offset,
 
           DONE            => awaitingNewInstr
       );
@@ -122,7 +126,7 @@ begin
   mem : entity work.memory_interface(v1)
       port map(
           clk         => clk,
-          address         => x_reg_in,
+          address         => x_reg_buf,
           data_write      => C,
           data_read       => mem_data_out,
           output_enable   => mem_read,
@@ -192,9 +196,16 @@ begin
           B=>B, 
           C=>C, 
           R=>R, 
-          X => x_reg_in,
+          X => x_reg_buf,
           use_v => v_use_a,
           op=>ALU_OP
       );
+
+      process(clk)
+      begin
+        if(rising_edge(clk)) then
+          x_reg_buf <= STD_LOGIC_VECTOR(unsigned(x_reg_in) + unsigned(mem_offset) - 1);
+        end if;
+      end process;
 
 end v1;
