@@ -50,6 +50,7 @@ architecture v1 of lane is
   signal mem_ready                : std_logic;
   signal x_reg_buf                : std_logic_vector(nr_of_mem_addr_bits-1 DOWNTO 0);
   signal mem_offset               : std_logic_vector(31 DOWNTO 0);
+  signal wb_select                : std_logic;
 
   -- Memory signals
 
@@ -70,19 +71,19 @@ architecture v1 of lane is
   --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
-  -- wb: process(clk)
-  -- begin
-  --     if(rising_edge(clk) and wb_writeEnable = '1') then
-  --         case mem_read is
-  --             when '1'    => wb_register <= mem_data_out;
-  --             when others => wb_register <= R;
-  --         end case;
-  --     end if;
-  -- end process;
+--  wb: process(clk)
+--  begin
+--      if(falling_edge(clk) and wb_writeEnable = '1') then
+--          case mem_read is
+--              when '1'    => wb_register <= mem_data_out;
+--              when others => wb_register <= R;
+--          end case;
+--      end if;
+--  end process;
 
-  with mem_read SELECT wb_register <=
-      R when '0',
-      mem_data_out when OTHERS;
+   with wb_select SELECT wb_register <=
+       R when '0',
+       mem_data_out when OTHERS;
 
   ctrl : entity work.control_unit_lane(v2)
       generic map (
@@ -118,6 +119,8 @@ begin
           write_vl        => write_vl,
           continue        => mem_ready,
           mem_offset      => mem_offset,
+          wb_select       => wb_select,
+
 
           DONE            => awaitingNewInstr
       );
@@ -201,11 +204,11 @@ begin
           op=>ALU_OP
       );
 
-      process(clk)
-      begin
-        if(rising_edge(clk)) then
+      --process(clk)
+      --begin
+      --  if(falling_edge(clk)) then
           x_reg_buf <= STD_LOGIC_VECTOR(unsigned(x_reg_in) + unsigned(mem_offset) - 1);
-        end if;
-      end process;
+      --  end if;
+      --end process;
 
 end v1;

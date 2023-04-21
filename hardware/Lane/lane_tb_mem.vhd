@@ -114,6 +114,10 @@ begin
     resetn <= '1';
 
 
+    -- Set vector length to 64 bits 
+    op_code <= "11000000000000100111000001010111";
+    wait on done;
+    wait on done;
     -- load unit-stride from address 0x0 to vector register 4
     -- vle8.v VR(4) (0x0)  
     x_reg_in <= "00000000000000000000000000000000";
@@ -123,6 +127,10 @@ begin
     wait on done;
     op_code <= "00000000000000000000000000000000";
 
+    -- Set vector length to 128 bits
+    op_code <= "11000000000001000111000001010111";
+    wait on done;
+    wait on done;
     -- load unit-stride from address 0x4 to vector register 2 
     -- vle8.v VR(2) (0x4)
     x_reg_in <= "00000000000000000000000000000100";
@@ -130,10 +138,13 @@ begin
     op_code <= "00000000100000000000000100000111";
     wait on done;
     wait on done;
-    wait until rising_edge(clk);
     op_code <= "00000000000000000000000000000000";
     --wait for 100 ns;
 
+    -- Set vector length to 64 elements
+    op_code <= "11000000000000100111000001010111";
+    wait on done;
+    wait on done;
     
     -- store unit stride from vector register 4 to address 0x0
     x_reg_in <= "00000000000000000000000000000000";
@@ -142,6 +153,11 @@ begin
     wait on done;
     wait on done;
     op_code <= "00000000000000000000000000000000";
+
+    -- Set vector length to 128 elements
+    op_code <= "11000000000001000111000001010111";
+    wait on done;
+    wait on done;
     
     
     -- store unit stride from vector register 2 to address 0x4

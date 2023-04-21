@@ -83,10 +83,10 @@ architecture v2 of dummy_mem is
         mem_ready <= '1';
         mem: process(clk, write_op, read_op, addr)
         begin
-            if(read_op = '0') then
-                data_out <= (others => 'U');
-            end if;
-            if(falling_edge(clk)) then
+--             if(read_op = '0') then
+--                 data_out <= (others => 'Z');
+--            end if;
+            if(rising_edge(clk)) then
                 if(read_op = '1') then
                     data_out <= m_array(to_integer(unsigned(addr)));
                 elsif(write_op = '1') then

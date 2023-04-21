@@ -31,6 +31,7 @@ ENTITY control_unit_lane IS
         VLEN_U                  : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
         WRITE_VL                 : OUT STD_LOGIC;
         mem_offset              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        wb_select               : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC
     );
 end control_unit_lane;
@@ -54,6 +55,8 @@ signal op_cat       : OP_CATEGORY;
 signal VSETIVLI_SIG  : VSETIVLI;
 
 signal num_ex       : STD_LOGIC_VECTOR(63 DOWNTO 0);
+signal mem_offset_i : STD_LOGIC_VECTOR(31 DOWNTO 0);
+signal prev_offset  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 begin
     
@@ -119,7 +122,11 @@ begin
         REGW_1 WHEN OPMVV | OPMVX | VL_unit_stride,
         '0' WHEN OTHERS;
 
-    mem_offset <= num_ex(34 DOWNTO 3);
+    with op_cat SELECT mem_offset <=
+        mem_offset_i WHEN VL_unit_stride,
+        prev_offset  WHEN OTHERS; 
+
+    mem_offset_i <= num_ex(34 DOWNTO 3);
     update_state: process(clk, resetn)
     begin
         if(resetn = '0') then 
@@ -128,6 +135,7 @@ begin
         elsif(falling_edge(clk)) then -- FSM, execute the correct number of states
             advance <= continue;
             prev_state <= state;
+            prev_offset <= mem_offset_i;
             case op_cat is
               when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
                 if(unsigned(VLENB) > unsigned(num_ex)) THEN
@@ -135,6 +143,7 @@ begin
                     when INSTR  =>
                         state <= EX1;
                         num_ex(3) <= '1';
+                        report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
                         num_ex(3) <= '0';
@@ -154,8 +163,15 @@ begin
                   num_ex <= (OTHERS => '0');
                 end if;
             when OTHERS =>
-              state <= INSTR;
-              num_ex <= (OTHERS => '0');
+              if(state = INSTR) THEN
+                report "Trying to exit instr phase with single cycli op code" Severity note;
+                state <= EX1;
+                num_ex(3) <= '1';
+              else
+                report "Trying to return to instr phase with single cycle instruction " Severity note;
+                state <= INSTR;
+                num_ex <= (OTHERS => '0');
+              end if;
             end case;
 
             case op_type is
@@ -221,13 +237,16 @@ begin
                     -- advance <= '0';
                 -- macc funct6 = "101101"
                 when VL_unit_stride => -- Todo
+                    wb_select <= '1';
                     case ld_st_signal.field3 is
                         when "00000" => null; -- unit-stride load
 
                         when "01000" =>  -- unit-stride, whole register load
+                          if(state /= INSTR) then
                             MEM_READ <= '1';
                             REG_C    <= ld_st_signal.field1;
                             WB_WRITE_ENABLE <= '1';
+                          end if;
                         
                         when "01011" => null; -- unit-stride, mask load, EEW=8
                         
@@ -242,9 +261,11 @@ begin
                         when "00000" => null; -- unit-stride store
 
                         when "01000" => -- unit-stride, whole register store
-                            MEM_WRITE <= '1';
                             V_USE_C   <= '1';
                             REG_C    <= ld_st_signal.field1;
+                          if(state /= EX1) then -- No memory writes in INSTR phase
+                            MEM_WRITE <= '1';
+                          end if;
 
                         
                         when "01011" => null; -- unit-stride, mask store, EEW=8
@@ -259,6 +280,7 @@ begin
                 when OPMVV | OPMVX =>
                     
 
+                    wb_select <= '0';
                     -- Register setup
 
                     REG_A <= op_v_signal.field2;
