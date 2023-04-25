@@ -141,8 +141,8 @@ begin
     op_code <= "00000000000000000000000000000000";
     --wait for 100 ns;
 
-    -- Set vector length to 64 elements
-    op_code <= "11000000000000100111000001010111";
+    -- Set vector length to 128 elements
+    op_code <= "11000000000001000111000001010111";
     wait on done;
     wait on done;
     
@@ -154,8 +154,8 @@ begin
     wait on done;
     op_code <= "00000000000000000000000000000000";
 
-    -- Set vector length to 128 elements
-    op_code <= "11000000000001000111000001010111";
+    -- Set vector length to 64 elements
+    op_code <= "11000000000000100111000001010111";
     wait on done;
     wait on done;
     

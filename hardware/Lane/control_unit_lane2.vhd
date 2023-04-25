@@ -132,6 +132,7 @@ begin
         if(resetn = '0') then 
             advance <= '0';
             state   <= INSTR;
+            num_ex  <= (OTHERS => '0');
         elsif(falling_edge(clk)) then -- FSM, execute the correct number of states
             advance <= continue;
             prev_state <= state;

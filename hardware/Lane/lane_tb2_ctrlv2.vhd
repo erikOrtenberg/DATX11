@@ -18,6 +18,7 @@ architecture test of lane_tb2_ctrlv2 is
             clk                 : in std_logic;
             resetn              : in std_logic;
             op_code	            : in std_logic_vector(31 downto 0);
+            x_reg_in            : std_logic_vector(31 DOWNTO 0);
             done                : out std_logic
         );
     end component lane;
@@ -38,6 +39,7 @@ begin
             clk => clk,
             resetn => resetn,
             op_code => op_code,
+            x_reg_in => (OTHERS => '0'),
             done => done
         );
         
@@ -96,12 +98,13 @@ begin
        wait for 20 ns;
        
     end LOOP;
+    op_code <= "10110110000000001010000101010111";
+    wait until falling_edge(clk);
     reg_addr <= release;
     reg_idx <= release;
     regIn <= release;
     regW <= release;
     state <= release;
-    op_code <= "10110110000000001010000101010111";
     WHILE not ENDFILE(vectorFile) LOOP
     wait on done;
     readline(vectorFile,vline);
