@@ -52,3 +52,11 @@ Erik har arbetat med simulering av minnet för load/store instruktioner. Fredrik
 
 ## LV3
 Denna vecka har vi hållt veckomöte och handledarmöte. Erik har bråkat med Vivado när han försökt syntetisera VPUn. Sofia har arbetat på rapporten. Johannes har strukturerat upp rapporten och sketchat upp slutgiltigt upplägg samt skrivit klart punkter. Fredrik har skrivit diskussion och om numeriska format men blev sedan sjuk och trött :(.Adam har fortsatt skriva en testkrets för att köra DMA och GP samtidigt.
+
+## LV 4
+Vi jobbade på rapporten. Skrev mycket :) Vi fick äntligen VPUn att syntentisera! Vi jobbar vidare på VPU optimeringar. 
+
+## LV 5
+
+
+## LV 6
