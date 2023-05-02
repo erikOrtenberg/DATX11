@@ -236,7 +236,7 @@ begin
       port map(
           A=>A, 
           B=>B, 
-          C=>C_i, 
+          C=>C, 
           R=>R, 
           X => x_reg_buf,
           use_v => v_use_a,

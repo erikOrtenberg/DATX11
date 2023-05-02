@@ -152,7 +152,7 @@ begin
             advance <= '0';
             state   <= INSTR;
             num_ex  <= (OTHERS => '0');
-        elsif(falling_edge(clk)) then -- FSM, execute the correct number of states
+        elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
             if (op_cat = Vl_unit_stride) then 
                 advance <= load_valid;
             elsif (op_cat = VS_unit_stride) then
@@ -234,7 +234,7 @@ begin
         end if;
     end process;
 
-    control_signals: process(state,resetn)
+    control_signals: process(state,resetn,op_cat, ld_st_signal,op_v_signal,VSETIVLI_SIG)
     begin
         if(resetn = '0') then
             mem_read <= '0';
@@ -364,3 +364,4 @@ begin
         end if;
     end process; 
 end v2;
+
