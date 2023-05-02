@@ -18,7 +18,24 @@ entity lane is
       RESETN              : in std_logic;
       op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
       x_reg_in      : in std_logic_vector(nr_of_mem_addr_bits-1   DOWNTO 0);
-      done		    : out std_logic
+
+      done		        : out std_logic;
+        
+      -- data signals
+      store_data          : out std_logic_vector (bus_width-1 downto 0);
+      load_data           : in std_logic_vector (bus_width-1 downto 0);
+      
+      -- needs to be set at the end of each memory operation
+      store_last          : out std_logic;
+      
+      -- these signals tell the memory to load/store
+      store_enable        : out std_logic;
+      load_enable         : out std_logic;
+      
+      -- these 2 signals are how the mem interface tells the vpu to continue/stop
+      store_ready         : in std_logic;
+      load_valid          : in std_logic
+
   --todo add ports
   );
 end lane;
@@ -63,6 +80,10 @@ architecture v1 of lane is
   signal csigs_u:   crs;
   signal write_csr: std_logic;
   signal write_vl:  std_logic;
+  
+  signal mem_last : std_logic;
+
+  signal C_i : std_logic_vector(bus_width - 1 downto 0);
 
   -- Scalar register signals
 
@@ -117,8 +138,9 @@ begin
           VLEN_U          => csigs_u.vl.vl,
           VLENB_U         => csigs_u.vl.vlb,
           write_vl        => write_vl,
-          continue        => mem_ready,
-          mem_offset      => mem_offset,
+          load_valid      => load_valid,
+          store_ready     => store_ready,
+            mem_offset    => mem_offset,
           wb_select       => wb_select,
 
 
@@ -126,17 +148,34 @@ begin
       );
 
   -- mem_ahttps://raw.githubusercontent.com/erikOrtenberg/DATX11/ft_sim_mem/hardware/Memory/dummy_memory.vhdddr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
-  mem : entity work.memory_interface(v1)
-      port map(
-          clk         => clk,
-          address         => x_reg_buf,
-          data_write      => C,
-          data_read       => mem_data_out,
-          output_enable   => mem_read,
-          write_enable    => mem_write,
-          mem_ready       => mem_ready
-      );
-
+        
+    -- data signals
+    store_data  <=  C;
+    mem_data_out <= load_data;
+         
+    -- needs to be set at the end of each memory operation
+    store_last <= mem_last;
+    mem_last <= awaitingNewInstr and mem_write;
+         
+    -- these signals tell the memory to load/store
+    store_enable        <= mem_write;
+    load_enable         <= mem_read;
+         
+    -- left as or for now
+    mem_ready <= store_ready or load_valid;
+ 
+ 
+    --mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
+    -- mem : entity work.memory_interface(v1)
+    --     port map(
+    --         clk             => clk,
+    --         address         => x_reg_in,
+    --         data_write      => C,
+    --         data_read       => mem_data_out,
+    --         output_enable   => mem_read,
+    --         write_enable    => mem_write,
+    --         mem_ready       => mem_ready
+    --       );
   -- Shouldn't be in the VPU
   --xreg : entity work.x_register_file(v1)
    --   port map(
@@ -197,7 +236,7 @@ begin
       port map(
           A=>A, 
           B=>B, 
-          C=>C, 
+          C=>C_i, 
           R=>R, 
           X => x_reg_buf,
           use_v => v_use_a,

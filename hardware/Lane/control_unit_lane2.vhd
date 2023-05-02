@@ -14,7 +14,8 @@ ENTITY control_unit_lane IS
         resetn: IN STD_LOGIC;
 
         OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
-        CONTINUE                : IN STD_LOGIC;
+        load_valid              : IN STD_LOGIC;
+        store_ready             : in std_logic;
         VLENB                   : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
         VLEN                    : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
@@ -57,6 +58,24 @@ signal VSETIVLI_SIG  : VSETIVLI;
 signal num_ex       : STD_LOGIC_VECTOR(63 DOWNTO 0);
 signal mem_offset_i : STD_LOGIC_VECTOR(31 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+--output registers
+--signal REG_A_i,REG_B_i,REG_C_i       : STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
+--signal V_USE_A_i,V_USE_B_i,V_USE_C_i :  STD_LOGIC;
+--signal X_USE_A,X_USE_B,X_USE_C :  STD_LOGIC;
+--signal MEM_READ,MEM_WRITE      :  STD_LOGIC;
+--signal WB_WRITE_ENABLE         :  STD_LOGIC;
+-- Add write enable signals to block when reading/writing to memory
+--signal REGR_IDX                :  STD_LOGIC_VECTOR(1 DOWNTO 0);
+--signal REGW_IDX                :  STD_LOGIC_VECTOR(1 DOWNTO 0);
+--signal REGR,REGW               :  STD_LOGIC;
+--signal ALU_OP                  :  STD_LOGIC_VECTOR(ALU_OP_LENGTH - 1 downto 0);
+--signal VLENB_U                 :  STD_LOGIC_VECTOR(63 DOWNTO 0);
+--signal VLEN_U                  :  STD_LOGIC_VECTOR(63 DOWNTO 0);
+--signal WRITE_VL                :  STD_LOGIC;
+--signal mem_offset              :  STD_LOGIC_VECTOR(31 DOWNTO 0);
+--signal wb_select               :  STD_LOGIC;
+--signal DONE                    :  STD_LOGIC
 
 begin
     
@@ -134,9 +153,17 @@ begin
             state   <= INSTR;
             num_ex  <= (OTHERS => '0');
         elsif(falling_edge(clk)) then -- FSM, execute the correct number of states
-            advance <= continue;
+            if (op_cat = Vl_unit_stride) then 
+                advance <= load_valid;
+            elsif (op_cat = VS_unit_stride) then
+                advance <= store_ready;
+            else 
+                advance <= '1';
+            end if;
+            
             prev_state <= state;
             prev_offset <= mem_offset_i;
+            if(advance = '1') then
             case op_cat is
               when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
                 if(unsigned(VLENB) > unsigned(num_ex)) THEN
@@ -144,7 +171,7 @@ begin
                     when INSTR  =>
                         state <= EX1;
                         num_ex(3) <= '1';
-                        report "Trying to exit instr phase with multi cycli op code" Severity note;
+                        --report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
                         num_ex(3) <= '0';
@@ -165,15 +192,16 @@ begin
                 end if;
             when OTHERS =>
               if(state = INSTR) THEN
-                report "Trying to exit instr phase with single cycli op code" Severity note;
+                --report "Trying to exit instr phase with single cycli op code" Severity note;
                 state <= EX1;
                 num_ex(3) <= '1';
               else
-                report "Trying to return to instr phase with single cycle instruction " Severity note;
+                --report "Trying to return to instr phase with single cycle instruction " Severity note;
                 state <= INSTR;
                 num_ex <= (OTHERS => '0');
               end if;
             end case;
+            end if;
 
             case op_type is
                 when NOP => op_cat <= NOP_CAT;
@@ -223,16 +251,20 @@ begin
             REG_C   <= (others => '0');
             ALU_OP  <= (others => '0');
         else
-
-            V_USE_A <= '0';
-            V_USE_B <= '0';
-            V_USE_C <= '0';
-            X_USE_A <= '0';
-            X_USE_B <= '0';
-            X_USE_C <= '0';
-            MEM_READ <= '0';
-            MEM_WRITE <= '0';
-
+        
+        mem_read <= '0';
+        mem_write <= '0';
+        V_USE_A <= '0';
+        V_USE_B <= '0';
+        V_USE_C <= '0';
+        X_USE_A <= '0';
+        X_USE_B <= '0';
+        X_USE_C <= '0';
+        WB_WRITE_ENABLE <= '0';
+        REG_A   <= (others => '0');
+        REG_B   <= (others => '0');
+        REG_C   <= (others => '0');
+        ALU_OP  <= (others => '0');
             case op_cat is
                 when NOP_CAT =>
                     -- advance <= '0';

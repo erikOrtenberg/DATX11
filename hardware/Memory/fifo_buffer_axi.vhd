@@ -30,7 +30,7 @@ entity fifo_buffer_axi is
     );
 end fifo_buffer_axi;
 
-architecture behavioral of fifo_buffer_axi is
+architecture v1 of fifo_buffer_axi is
 
 subtype buffer_entry is std_logic_vector(bus_width - 1 + 1 + keep_size downto 0);
 
@@ -105,4 +105,4 @@ begin
         empty when read_pointer = write_pointer
         else other;
 
-end behavioral;
+end v1;
