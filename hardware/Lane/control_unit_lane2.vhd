@@ -57,7 +57,7 @@ signal VSETIVLI_SIG  : VSETIVLI;
 
 signal num_ex       : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal mem_offset_i : STD_LOGIC_VECTOR(4 DOWNTO 0);
-signal prev_offset  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+signal prev_offset  : STD_LOGIC_VECTOR(4 DOWNTO 0);
 
 --output registers
 --signal REG_A_i,REG_B_i,REG_C_i       : STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
@@ -151,7 +151,7 @@ begin
         if(resetn = '0') then 
             advance <= '0';
             state   <= INSTR;
-            num_ex  <= (OTHERS => '0');
+            num_ex  <= "00001";
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
             if (op_cat = Vl_unit_stride) then 
                 advance <= load_valid;
@@ -170,7 +170,6 @@ begin
                   CASE state IS
                     when INSTR  =>
                         state <= EX1;
-                        num_ex(0) <= '1'; 
                         --report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
@@ -183,21 +182,21 @@ begin
                         num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     when OTHERS => 
                         state <= INSTR;
-                        num_ex <= (OTHERS => '0');
+                        num_ex <= "00001";
                   end CASE;
                 else
                   state <= INSTR;
-                  num_ex <= (OTHERS => '0');
+                  num_ex <= "00001";
                 end if;
             when OTHERS =>
               if(state = INSTR) THEN
                 --report "Trying to exit instr phase with single cycli op code" Severity note;
                 state <= EX1;
-                num_ex(3) <= '1';
+                num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
               else
                 --report "Trying to return to instr phase with single cycle instruction " Severity note;
                 state <= INSTR;
-                num_ex <= (OTHERS => '0');
+                num_ex <= "00001";
               end if;
             end case;
             end if;
@@ -349,7 +348,8 @@ begin
                         when "0-" => NULL; -- VSETVLI
                         WHEN "11" =>       -- VSETIVLI
                             VLENB_U(4 DOWNTO 0) <= VSETIVLI_SIG.UIMM;
-                            VLEN_U(4 DOWNTO 0) <= (OTHERS => '0');
+                            VLEN_U(3 DOWNTO 0) <=  VSETIVLI_SIG.UIMM(4 DOWNTO 1);
+                            VLEN_U(4) <= '0';
                         WHEN "10" => NULL; -- VSETVL
                         WHEN OTHERS => NULL;
                     end CASE?;
