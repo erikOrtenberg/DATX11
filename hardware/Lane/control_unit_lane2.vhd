@@ -263,6 +263,10 @@ begin
         REG_B   <= (others => '0');
         REG_C   <= (others => '0');
         ALU_OP  <= (others => '0');
+        VLENB_U <= (OTHERS=> '0');
+        VLEN_U  <= (OTHERS=> '0');
+        write_vl <= (OTHERS => '0');
+        wb_select <= '0';
             case op_cat is
                 when NOP_CAT =>
                     -- advance <= '0';
