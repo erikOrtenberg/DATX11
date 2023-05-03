@@ -31,7 +31,7 @@ ENTITY control_unit_lane IS
         VLENB_U                 : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         VLEN_U                  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         WRITE_VL                 : OUT STD_LOGIC;
-        mem_offset              : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+        mem_offset              : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         wb_select               : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC;
         time_out                : out std_logic
@@ -60,6 +60,8 @@ signal VSETIVLI_SIG  : VSETIVLI;
 signal num_ex       : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal count_time_out : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(4 DOWNTO 0);
+signal mem_offset_i : STD_LOGIC_VECTOR(1 DOWNTO 0);
+signal prev_offset  : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
 --output registers
 --signal REG_A_i,REG_B_i,REG_C_i       : STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
@@ -196,19 +198,24 @@ begin
                     when INSTR  =>
                         state <= EX1;
                         num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                        mem_offset_i <= "00";
                         --report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
                         num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                        mem_offset_i <= "01";
                     when EX2    =>
                         state <= EX3;
                         num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                        mem_offset_i <= "10";
                     when EX3    =>
                         state <= EX4;
                         num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                        mem_offset_i <= "11";
                     when OTHERS => 
                         state <= INSTR;
                         num_ex <= "00001";
+                        mem_offset_i <= "00";
                   end CASE;
                 else
                   state <= INSTR;

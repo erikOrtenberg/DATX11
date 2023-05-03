@@ -13,33 +13,30 @@ end entity lane_testbench;
 
 architecture mem of lane_testbench is
 
-    component lane is
-        port (
-            clk                 : in std_logic;
-            resetn              : in std_logic;
-            op_code	            : in std_logic_vector(31 downto 0);
-            x_reg_in            : in std_logic_vector(31 downto 0);
-            done                : out std_logic
-        );
-    end component lane;
-
     signal clk, resetn : std_logic := '0';
     signal op_code, x_reg_in : std_logic_vector(31 downto 0);
     signal expected: std_logic_vector(63 DOWNTO 0);
     signal done: std_logic;
-    FILE vectorFile: TEXT OPEN READ_MODE is "/home/repos/DATX11/vectorfile.txt";
+    FILE vectorFile: TEXT OPEN READ_MODE is "/home/fredrik/SRC/DATX11/vectorfile.txt";
 
 
 
 begin
 
-    lane_instance : component lane
+  lane_instance : entity work.lane
         port map (
             clk => clk,
             resetn => resetn,
             op_code => op_code,
             x_reg_in => x_reg_in, 
-            done => done
+            done => done,
+            store_data => open,
+            load_data => (OTHERS=>'0'),
+            store_last => open,
+            store_enable => open,
+            load_enable => open,
+            store_ready => '1',
+            load_valid => '1'
         );
         
 
