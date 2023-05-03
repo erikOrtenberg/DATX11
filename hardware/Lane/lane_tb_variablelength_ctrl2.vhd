@@ -13,15 +13,15 @@ end entity lane_tb;
 
 architecture vlength_ctrl2 of lane_tb is
 
-    component lane is
-        port (
-            clk                 : in std_logic;
-            resetn              : in std_logic;
-            op_code	            : in std_logic_vector(31 downto 0);
-            x_reg_in            : in std_logic_vector(31 DOWnTO 0);
-            done                : out std_logic
-        );
-    end component lane;
+   --  component lane is
+   --      port (
+   --          clk                 : in std_logic;
+   --          resetn              : in std_logic;
+   --          op_code	            : in std_logic_vector(31 downto 0);
+   --          x_reg_in            : in std_logic_vector(31 DOWnTO 0);
+   --          done                : out std_logic
+   --      );
+   --  end component lane;
 
     signal clk, resetn : std_logic := '0';
     signal op_code : std_logic_vector(31 downto 0);
@@ -35,7 +35,7 @@ architecture vlength_ctrl2 of lane_tb is
 
 begin
 
-    lane_instance : component lane
+  lane_instance : entity work.lane(v1)
         port map (
             clk => clk,
             resetn => resetn,
@@ -43,7 +43,12 @@ begin
             x_reg_in => x_reg_in,
             done => done,
             store_data  => open,
-            load_data   => (others => '0')
+            load_data   => (others => '0'),
+            store_last => open,
+            store_enable => open,
+            load_enable => open,
+            store_ready => '0',
+            load_valid => '0'
         );
         
 
@@ -111,7 +116,7 @@ begin
        wait for 20 ns;
        
     end LOOP;
-    wait until falling_edge(clk);
+    wait until rising_edge(clk);
     reg_addr <= release;
     reg_idx <= release;
     regIn <= release;

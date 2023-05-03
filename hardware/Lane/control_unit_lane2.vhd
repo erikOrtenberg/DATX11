@@ -42,6 +42,7 @@ architecture v2 of control_unit_lane is
 
 SIGNAL advance : STD_LOGIC;
 SIGNAL REGW_1  : STD_LOGIC;
+signal REGR_1  : STD_LOGIC;
 SIGNAL state   : lane_state_type;
 SIGNAL prev_state  : lane_state_type;
 
@@ -117,35 +118,37 @@ begin
         '1' when INSTR,
         '0' when others; 
 
-    with state select REGR_IDX <=
-        "00" when EX1,
-        "01" when EX2,
-        "10" when EX3,
-        "11" when others;  
+    -- with state select REGR_IDX <=
+    --     "00" when EX1,
+    --     "01" when EX2,
+    --     "10" when EX3,
+    --     "11" when others;  
 
-    with state select REGR <=
-        '0' when INSTR,
-        '1' when others;
+    -- with state select REGR <=
+    --     '0' when INSTR,
+    --     '1' when others;
 
-    with prev_state select REGW_IDX <=
-        "00" when EX1,
-        "01" when EX2,
-        "10" when EX3,
-        "11" when others;  
-    
-    with prev_state select REGW_1 <=
-        '0' when INSTR,
-        '1' when others;
+    -- with prev_state select REGW_IDX <=
+    --     "00" when EX1,
+    --     "01" when EX2,
+    --     "10" when EX3,
+    --     "11" when others;  
+    -- 
+    -- with prev_state select REGW_1 <=
+    --     '0' when INSTR,
+    --     '1' when others;
 
-    with op_cat SELECT REGW <= 
-        REGW_1 WHEN OPMVV | OPMVX | VL_unit_stride,
-        '0' WHEN OTHERS;
+    -- with op_cat SELECT REGW <= 
+    --     REGW_1 WHEN OPMVV | OPMVX | VL_unit_stride,
+    --     '0' WHEN OTHERS;
 
     with op_cat SELECT mem_offset <=
         mem_offset_i WHEN VL_unit_stride,
         prev_offset  WHEN OTHERS; 
 
     mem_offset_i <= num_ex;
+    REGW <= REGR_1;
+    REGR <= REGR_1;
     update_state: process(clk, resetn)
     begin
         if(resetn = '0') then 
@@ -170,6 +173,7 @@ begin
                   CASE state IS
                     when INSTR  =>
                         state <= EX1;
+                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                         --report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
@@ -200,37 +204,46 @@ begin
               end if;
             end case;
             end if;
-
-            case op_type is
-                when NOP => op_cat <= NOP_CAT;
-                when OP_VEC =>
-                    case op_v_signal.funct3 is
-                        when "000"  => op_cat <= OPIVV;
-                        when "001"  => op_cat <= OPFVV;
-                        when "010"  => op_cat <= OPMVV;
-                        when "011"  => op_cat <= OPIVI;
-                        when "100"  => op_cat <= OPIVX;
-                        when "101"  => op_cat <= OPFVF;
-                        when "110"  => op_cat <= OPMVX;
-                        when "111"  => op_cat <= OPCFG;
-                        when others => null;
-                    end case;   
-                        
-                when LD_FP =>
-                    case ld_st_signal.mop is
-                        when "00"   => op_cat <= VL_unit_stride;
-                        when "10"   => op_cat <= VLS_strided;
-                        when others => op_cat <= VLX_indexed;
-                    end case;
-                when ST_FP =>
-                    case ld_st_signal.mop is
-                        when "00"   => op_cat <= VS_unit_stride;
-                        when "10"   => op_cat <= VSS_strided;
-                        when others => op_cat <= VSX_indexed;
-                    end case;
-            end case;
+            if(op_cat = OPMVV or op_cat = OPMVX) then
+              REGW_1 <= REGR;
+            else
+              REGW_1 <= '0';
+            end if;
+            REGW_IDX <= REGR_IDX;
         end if;
     end process;
+
+    op_category: process(OP,op_type,op_v_signal,ld_st_signal)
+    begin
+        case op_type is
+            when NOP => op_cat <= NOP_CAT;
+            when OP_VEC =>
+                case op_v_signal.funct3 is
+                    when "000"  => op_cat <= OPIVV;
+                    when "001"  => op_cat <= OPFVV;
+                    when "010"  => op_cat <= OPMVV;
+                    when "011"  => op_cat <= OPIVI;
+                    when "100"  => op_cat <= OPIVX;
+                    when "101"  => op_cat <= OPFVF;
+                    when "110"  => op_cat <= OPMVX;
+                    when "111"  => op_cat <= OPCFG;
+                    when others => null;
+                end case;   
+                    
+            when LD_FP =>
+                case ld_st_signal.mop is
+                    when "00"   => op_cat <= VL_unit_stride;
+                    when "10"   => op_cat <= VLS_strided;
+                    when others => op_cat <= VLX_indexed;
+                end case;
+            when ST_FP =>
+                case ld_st_signal.mop is
+                    when "00"   => op_cat <= VS_unit_stride;
+                    when "10"   => op_cat <= VSS_strided;
+                    when others => op_cat <= VSX_indexed;
+                end case;
+        end case;
+      end process;
 
     control_signals: process(state,resetn,op_cat, ld_st_signal,op_v_signal,VSETIVLI_SIG)
     begin
@@ -248,6 +261,12 @@ begin
             REG_B   <= (others => '0');
             REG_C   <= (others => '0');
             ALU_OP  <= (others => '0');
+            VLENB_U <= (OTHERS=> '0');
+            VLEN_U  <= (OTHERS=> '0');
+            write_vl <=  '0';
+            wb_select <= '0';
+            REGR_IDX <= (OTHERS => '0');
+            REGR_1 <= '0';
         else
         
         mem_read <= '0';
@@ -265,8 +284,11 @@ begin
         ALU_OP  <= (others => '0');
         VLENB_U <= (OTHERS=> '0');
         VLEN_U  <= (OTHERS=> '0');
-        write_vl <= (OTHERS => '0');
+        write_vl <=  '0';
         wb_select <= '0';
+        REGR_IDX <= (OTHERS => '0');
+        REGR_1 <= '0';
+        
             case op_cat is
                 when NOP_CAT =>
                     -- advance <= '0';
@@ -296,6 +318,7 @@ begin
                         when "00000" => null; -- unit-stride store
 
                         when "01000" => -- unit-stride, whole register store
+                            REGR_1 <= '1';
                             V_USE_C   <= '1';
                             REG_C    <= ld_st_signal.field1;
                           if(state /= EX1) then -- No memory writes in INSTR phase
@@ -316,12 +339,17 @@ begin
                     
 
                     wb_select <= '0';
+                    if(state /= INSTR) then
+                        REGR_1      <= '1';
+                    end if;
                     -- Register setup
 
                     REG_A <= op_v_signal.field2;
                     REG_B <= op_v_signal.field3;
                     REG_C <= op_v_signal.field1;
                     V_USE_B <= '1'; -- B is always a vector
+                    V_USE_C <= '1';
+
                     WB_WRITE_ENABLE <= '1';
                 
                     if(op_cat = OPMVV) then
@@ -341,24 +369,33 @@ begin
                         when others => null; 
                     end case;
                 when OPCFG =>
-                    WRITE_VL <= '1';
-                    V_USE_A <= '0';
-                    X_USE_A <= '0';
-                    V_USE_B <= '0';
-                    X_USE_B <= '0';
-                    V_USE_C <= '0';
-                    X_USE_C <= '0';
+                    if(state /= INSTR) THEN
+                       WRITE_VL <= '1';
+                     end if;
                     CASE? OP(31 DOWNTO 30) is
                         when "0-" => NULL; -- VSETVLI
                         WHEN "11" =>       -- VSETIVLI
-                            VLENB_U(4 DOWNTO 0) <= VSETIVLI_SIG.UIMM;
-                            VLEN_U(3 DOWNTO 0) <=  VSETIVLI_SIG.UIMM(4 DOWNTO 1);
-                            VLEN_U(4) <= '0';
+                            VLENB_U <= VSETIVLI_SIG.UIMM;
+                            VLEN_U(0) <= '1';
+                            VLEN_U(1) <= VSETIVLI_SIG.UIMM(3);
+                            VLEN_U(2) <= VSETIVLI_SIG.UIMM(3) and VSETIVLI_SIG.UIMM(2); -- "00000"
+                            VLEN_U(3) <= VSETIVLI_SIG.UIMM(4);
                         WHEN "10" => NULL; -- VSETVL
                         WHEN OTHERS => NULL;
                     end CASE?;
                         
                 when others => null;
+            end case;
+
+            case state is
+              when EX1 =>
+                REGR_IDX <= "01";
+              when EX2 =>
+                REGR_IDX <= "10";
+              WHEN EX3 =>
+                REGR_IDX <= "11";
+              WHEN OTHERS =>
+                REGR_IDX <= "00";
             end case;
         end if;
     end process; 
