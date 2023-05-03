@@ -30,8 +30,8 @@ begin
       state.VXSAT.sat <= '0';
       state.VCSR.vxrm    <= (OTHERS => '0');
       state.VCSR.vxsat    <= '0';
-      state.VL.VL <= std_logic_vector(to_unsigned(256,64));
-      state.VL.VLB <= std_logic_vector(to_unsigned(32,64));
+      state.VL.VL <= "01111";
+      state.VL.VLB <= "11111";
 
       state.vtype.vill <= '0';
       state.vtype.reserved <= (OTHERS => '0');

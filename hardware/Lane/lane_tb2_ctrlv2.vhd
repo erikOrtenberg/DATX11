@@ -18,7 +18,22 @@ architecture test of lane_tb2_ctrlv2 is
             clk                 : in std_logic;
             resetn              : in std_logic;
             op_code	            : in std_logic_vector(31 downto 0);
-            x_reg_in            : std_logic_vector(31 DOWNTO 0);
+            x_reg_in            : in std_logic_vector(31 DOWNTO 0);
+      -- data signals
+            load_data           : in std_logic_vector (63 downto 0);
+            store_data          : out std_logic_vector (63 downto 0);
+            
+            -- needs to be set at the end of each memory operation
+            store_last          : out std_logic;
+            
+            -- these signals tell the memory to load/store
+            store_enable        : out std_logic;
+            load_enable         : out std_logic;
+            
+            -- these 2 signals are how the mem interface tells the vpu to continue/stop
+            store_ready         : in std_logic;
+            load_valid          : in std_logic;
+
             done                : out std_logic
         );
     end component lane;
@@ -40,7 +55,14 @@ begin
             resetn => resetn,
             op_code => op_code,
             x_reg_in => (OTHERS => '0'),
-            done => done
+            done => done,
+            store_last => open,
+            load_data => (OTHERS => '0'),
+            store_data => open,
+            store_enable => open,
+            load_enable => open,
+            store_ready => '0',
+            load_valid => '0'
         );
         
 
@@ -104,6 +126,7 @@ begin
     reg_idx <= release;
     regIn <= release;
     regW <= release;
+    wait until rising_edge(clk);
     state <= release;
     WHILE not ENDFILE(vectorFile) LOOP
     wait on done;

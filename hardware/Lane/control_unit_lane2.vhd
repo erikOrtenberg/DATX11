@@ -16,8 +16,8 @@ ENTITY control_unit_lane IS
         OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
         load_valid              : IN STD_LOGIC;
         store_ready             : in std_logic;
-        VLENB                   : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-        VLEN                    : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+        VLENB                   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+        VLEN                    : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
@@ -28,10 +28,10 @@ ENTITY control_unit_lane IS
         REGW_IDX                : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         REGR,REGW               : OUT STD_LOGIC;
         ALU_OP                  : OUT STD_LOGIC_VECTOR(ALU_OP_LENGTH - 1 downto 0);
-        VLENB_U                 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-        VLEN_U                  : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        VLENB_U                 : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+        VLEN_U                  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         WRITE_VL                 : OUT STD_LOGIC;
-        mem_offset              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        mem_offset              : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         wb_select               : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC
     );
@@ -55,8 +55,8 @@ signal op_type      : OP_CODE;
 signal op_cat       : OP_CATEGORY; 
 signal VSETIVLI_SIG  : VSETIVLI;
 
-signal num_ex       : STD_LOGIC_VECTOR(63 DOWNTO 0);
-signal mem_offset_i : STD_LOGIC_VECTOR(31 DOWNTO 0);
+signal num_ex       : STD_LOGIC_VECTOR(4 DOWNTO 0);
+signal mem_offset_i : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 --output registers
@@ -145,7 +145,7 @@ begin
         mem_offset_i WHEN VL_unit_stride,
         prev_offset  WHEN OTHERS; 
 
-    mem_offset_i <= num_ex(34 DOWNTO 3);
+    mem_offset_i <= num_ex;
     update_state: process(clk, resetn)
     begin
         if(resetn = '0') then 
@@ -166,22 +166,21 @@ begin
             if(advance = '1') then
             case op_cat is
               when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
-                if(unsigned(VLENB) > unsigned(num_ex)) THEN
+                if(unsigned(VLEN and num_ex) /= 0) THEN
                   CASE state IS
                     when INSTR  =>
                         state <= EX1;
-                        num_ex(3) <= '1';
+                        num_ex(0) <= '1'; 
                         --report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
-                        num_ex(3) <= '0';
-                        num_ex(4) <= '1';
+                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     when EX2    =>
                         state <= EX3;
-                        num_ex(3) <= '1';
+                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     when EX3    =>
                         state <= EX4;
-                        num_ex(5 DOWNTO 3) <= "100";
+                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     when OTHERS => 
                         state <= INSTR;
                         num_ex <= (OTHERS => '0');
@@ -349,12 +348,8 @@ begin
                     CASE? OP(31 DOWNTO 30) is
                         when "0-" => NULL; -- VSETVLI
                         WHEN "11" =>       -- VSETIVLI
-                            VLENB_U(63 DOWNTO 6) <= (OTHERS => '0');
-                            VLENB_U(5 DOWNTO 1) <= VSETIVLI_SIG.UIMM;
-                            VLENB_U(0) <= '0';
-                            VLEN_U(63 DOWNTO 9) <= (OTHERS => '0');
-                            VLEN_U(8 DOWNTO 4) <= VSETIVLI_SIG.UIMM;
-                            VLEN_U(3 DOWNTO 0) <= (OTHERS => '0');
+                            VLENB_U(4 DOWNTO 0) <= VSETIVLI_SIG.UIMM;
+                            VLEN_U(4 DOWNTO 0) <= (OTHERS => '0');
                         WHEN "10" => NULL; -- VSETVL
                         WHEN OTHERS => NULL;
                     end CASE?;

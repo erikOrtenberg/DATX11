@@ -66,7 +66,7 @@ architecture v1 of lane is
 
   signal mem_ready                : std_logic;
   signal x_reg_buf                : std_logic_vector(nr_of_mem_addr_bits-1 DOWNTO 0);
-  signal mem_offset               : std_logic_vector(31 DOWNTO 0);
+  signal mem_offset               : std_logic_vector(4 DOWNTO 0);
   signal wb_select                : std_logic;
 
   -- Memory signals
@@ -140,7 +140,7 @@ begin
           write_vl        => write_vl,
           load_valid      => load_valid,
           store_ready     => store_ready,
-            mem_offset    => mem_offset,
+           mem_offset    => mem_offset,
           wb_select       => wb_select,
 
 
@@ -246,8 +246,10 @@ begin
       --process(clk)
       --begin
       --  if(falling_edge(clk)) then
-          x_reg_buf <= STD_LOGIC_VECTOR(unsigned(x_reg_in) + unsigned(mem_offset) - 1);
+      --    x_reg_buf <= STD_LOGIC_VECTOR(unsigned(x_reg_in) + unsigned(mem_offset) - 1);
       --  end if;
       --end process;
+
+  x_reg_buf <= x_reg_in;
 
 end v1;

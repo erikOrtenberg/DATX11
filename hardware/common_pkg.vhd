@@ -57,8 +57,8 @@ package Common_pkg is    -- untested...
     end record VTYPE;
     
     type vl is RECORD
-      vl:   std_logic_vector(63 DOWNTO 0);
-      VLB:  std_logic_vector(63 DOWNTO 0);
+      vl:   std_logic_vector(4 DOWNTO 0);
+      VLB:  std_logic_vector(4 DOWNTO 0);
     end record vl;
     
     type vstart is RECORD

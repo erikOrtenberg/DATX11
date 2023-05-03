@@ -41,7 +41,9 @@ begin
             resetn => resetn,
             op_code => op_code,
             x_reg_in => x_reg_in,
-            done => done
+            done => done,
+            store_data  => open,
+            load_data   => (others => '0')
         );
         
 
