@@ -23,7 +23,9 @@ entity mem_buf_interface is
         -- these are towards the vpu
         store_data_in       : in std_logic_vector (63 downto 0);
         load_data_out       : out std_logic_vector (63 downto 0);
-        
+        load_last           : out std_logic;
+        load_keep           : out std_logic_vector(7 downto 0);
+        store_keep          : in std_logic_vector(7 downto 0);
         store_last          : in std_logic;
 
         -- set each enable to start a load/store
@@ -52,8 +54,6 @@ entity mem_buf_interface is
 end mem_buf_interface;
 
 architecture v1 of mem_buf_interface is
-    signal load_keep : std_logic_vector(7 downto 0);
-    signal load_last : std_logic;
     signal load_ready : std_logic;
     signal which_half : std_logic;
 
@@ -68,30 +68,37 @@ architecture v1 of mem_buf_interface is
     signal store_valid_32 : std_logic;
     signal store_valid_64 : std_logic;
 
+    signal store_keep_32 : std_logic_vector(3 downto 0);
+    signal store_keep_64 : std_logic_vector(7 downto 0);
+
 
 begin
 
     data_32 <= 
-        --data_64(63 downto 32) when which_half = '1' else
+        data_64(63 downto 32) when which_half = '1' else
         data_64(31 downto 0);
+    store_keep_32 <= "1111" when store_valid_64 = '1' else (others => '0');
     
-    change_half: process(clk)
+    change_half: process(clk, resetn)
     begin
-        if(rising_edge(clk))then 
-            if(store_valid_32 = '1' and store_ready_64 = '1') then
-                store_last_64 <= '0'; 
-                if(which_half = '0') then
-                    which_half <= '1';
-                    store_ready_32 <='0';
-                else
-                    if(store_last_32 = '1') then store_last_64 <= '1'; end if;
-                    which_half <='0';
-                    store_ready_32 <='1';
+        if(resetn = '1') then
+            which_half <= '0';
+        elsif(rising_edge(clk))then 
+            store_last_32 <= '0'; 
+            if(store_valid_64 = '1') then
+                if(store_ready_32 = '1') then
+                    if(which_half = '0') then
+                        which_half <= '1';
+                        store_ready_64 <='0';
+                    else
+                        if(store_last_64 = '1') then store_last_32 <= '1'; end if;
+                        which_half <='0';
+                        store_ready_64 <='1';
+                    end if;
                 end if;
-            end if;
+            else which_half <= '0'; end if;
         end if; 
     end process;
-
     load_buffer : entity work.fifo_buffer_axi(v1)
     generic map(
         bus_width       => 64,
@@ -101,7 +108,7 @@ begin
     )
     port map(
         read_tkeep      => open,
-        read_tlast      => open,
+        read_tlast      => load_last,
         read_tdata      => load_data_out,
         read_tvalid     => load_valid,
         read_tready     => load_enable,
@@ -115,7 +122,7 @@ begin
         resetn          => resetn
     );
 
-
+                        -- xreg <= (xin(31 downto 4), xin(3 downto 0) xor thingy
     store_buffer_64 : entity work.fifo_buffer_axi(v1)
     generic map(
         bus_width       => 64,
@@ -153,11 +160,10 @@ begin
         read_tvalid     => read_tvalid,
         read_tready     => read_tready,
          
-        write_tkeep     => "1111",
+        write_tkeep     => store_keep_32,
         write_tlast     => store_last_32,
         write_tdata     => data_32,
         write_tvalid    => store_valid_64,
-        write_tready    => store_ready_32,
         clk             => clk,
         resetn          => resetn
     );
