@@ -85,6 +85,7 @@ begin
         elsif(rising_edge(clk))then 
             store_ready_64 <= '0';
             store_last_32 <= '0'; 
+            store_valid_32 <= '0';
             if(store_valid_64 = '1') then
                 store_valid_32 <= '1';
                 if(store_ready_32 = '1') then

@@ -127,6 +127,7 @@ begin
         op_code => op_code,
         x_reg_in => x_reg_in,
         done => done,
+        store_last => store_last,
         store_data => store_data_in,
         load_data => load_data_out,
         store_enable => store_enable,
@@ -186,7 +187,10 @@ begin
         op_code <= "10110100000100010010000001010111";
         wait until done = '1';   
         op_code <= "00000000100000000000000000100111";
+        read_tready <= '1';
         wait until done = '1';
+        op_code <= (OTHERS => '0');
+
 
 
 
