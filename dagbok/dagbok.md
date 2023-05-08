@@ -61,4 +61,6 @@ Vi jobbade på rapporten. Skrev mycket :) Vi fick äntligen VPUn att syntentiser
 
 ## LV 6
 
+## LV 7
 
+Sofia och Fredrik har arbetat med att arbetat med att få fram resultat. resten av oss har arbetat med att beta av de puknter vi har i rapporten från Mateos feedback.
