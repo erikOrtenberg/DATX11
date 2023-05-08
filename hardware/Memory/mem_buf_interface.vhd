@@ -23,9 +23,9 @@ entity mem_buf_interface is
         -- these are towards the vpu
         store_data_in       : in std_logic_vector (63 downto 0);
         load_data_out       : out std_logic_vector (63 downto 0);
-        load_last           : out std_logic;
-        load_keep           : out std_logic_vector(7 downto 0);
-        store_keep          : in std_logic_vector(7 downto 0);
+        --load_last           : out std_logic;
+        --load_keep           : out std_logic_vector(7 downto 0);
+        --store_keep          : in std_logic_vector(7 downto 0);
         store_last          : in std_logic;
 
         -- set each enable to start a load/store
@@ -73,7 +73,6 @@ architecture v1 of mem_buf_interface is
 
 
 begin
-
     data_32 <= 
         data_64(63 downto 32) when which_half = '1' else
         data_64(31 downto 0);
@@ -81,19 +80,20 @@ begin
     
     change_half: process(clk, resetn)
     begin
-        if(resetn = '1') then
+        if(resetn = '0') then
             which_half <= '0';
         elsif(rising_edge(clk))then 
+            store_ready_64 <= '0';
             store_last_32 <= '0'; 
             if(store_valid_64 = '1') then
+                store_valid_32 <= '1';
                 if(store_ready_32 = '1') then
                     if(which_half = '0') then
                         which_half <= '1';
-                        store_ready_64 <='0';
                     else
-                        if(store_last_64 = '1') then store_last_32 <= '1'; end if;
+                        store_last_32 <= store_last_64;
                         which_half <='0';
-                        store_ready_64 <='1';
+                        store_ready_64 <= '1';
                     end if;
                 end if;
             else which_half <= '0'; end if;
@@ -108,7 +108,7 @@ begin
     )
     port map(
         read_tkeep      => open,
-        read_tlast      => load_last,
+        read_tlast      => open,   --this could be left as open too
         read_tdata      => load_data_out,
         read_tvalid     => load_valid,
         read_tready     => load_enable,
@@ -131,7 +131,7 @@ begin
         keep_size       => 8  -- 2log of bus_width
     )
     port map(
-        read_tkeep      => open,
+        read_tkeep      => store_keep_64,
         read_tlast      => store_last_64,
         read_tdata      => data_64,
         read_tvalid     => store_valid_64,
@@ -149,8 +149,8 @@ begin
     store_buffer_32 : entity work.fifo_buffer_axi(v1)
     generic map(
         bus_width       => 32,
-        buffer_length   => 8, -- amount of buffers
-        buffer_address  => 4, -- 2log of buffers + 1
+        buffer_length   => 16, -- amount of buffers
+        buffer_address  => 5, -- 2log of buffers + 1
         keep_size       => 4  -- 2log of bus_width
     )
     port map(
@@ -163,7 +163,8 @@ begin
         write_tkeep     => store_keep_32,
         write_tlast     => store_last_32,
         write_tdata     => data_32,
-        write_tvalid    => store_valid_64,
+        write_tvalid    => store_valid_32,
+        write_tready    => store_ready_32,
         clk             => clk,
         resetn          => resetn
     );

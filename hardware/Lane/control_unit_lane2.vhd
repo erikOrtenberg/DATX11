@@ -13,7 +13,7 @@ ENTITY control_unit_lane IS
         CLK: IN STD_LOGIC;
         resetn: IN STD_LOGIC;
 
-        OP                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
+        OP_in                      : IN STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
         load_valid              : IN STD_LOGIC;
         store_ready             : in std_logic;
         VLENB                   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -33,7 +33,8 @@ ENTITY control_unit_lane IS
         WRITE_VL                 : OUT STD_LOGIC;
         mem_offset              : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         wb_select               : OUT STD_LOGIC;
-        DONE                    : OUT STD_LOGIC
+        DONE                    : OUT STD_LOGIC;
+        time_out                : out std_logic
     );
 end control_unit_lane;
 
@@ -57,7 +58,7 @@ signal op_cat       : OP_CATEGORY;
 signal VSETIVLI_SIG  : VSETIVLI;
 
 signal num_ex       : STD_LOGIC_VECTOR(4 DOWNTO 0);
-signal mem_offset_i : STD_LOGIC_VECTOR(4 DOWNTO 0);
+signal count_time_out : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(4 DOWNTO 0);
 
 --output registers
@@ -77,6 +78,11 @@ signal prev_offset  : STD_LOGIC_VECTOR(4 DOWNTO 0);
 --signal mem_offset              :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 --signal wb_select               :  STD_LOGIC;
 --signal DONE                    :  STD_LOGIC
+
+signal OP                        : STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
+
+signal mem_time_out : integer := 0;
+signal time_out_i : std_logic;
 
 begin
     
@@ -143,10 +149,12 @@ begin
     --     '0' WHEN OTHERS;
 
     with op_cat SELECT mem_offset <=
-        mem_offset_i WHEN VL_unit_stride,
+        count_time_out WHEN VL_unit_stride,
         prev_offset  WHEN OTHERS; 
 
-    mem_offset_i <= num_ex;
+    time_out <= time_out_i;
+
+    count_time_out <= num_ex;
     REGW <= REGR_1;
     REGR <= REGR_1;
     update_state: process(clk, resetn)
@@ -155,18 +163,32 @@ begin
             advance <= '0';
             state   <= INSTR;
             num_ex  <= "00001";
+            mem_time_out <= 0;
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
+            op <= op_in;
             if (op_cat = Vl_unit_stride) then 
-                advance <= load_valid;
+                if(load_valid <= '1') then
+                    advance <= '1';
+                else
+                    advance <= '0';
+                    mem_time_out <= mem_time_out + 1;
+                end if;
             elsif (op_cat = VS_unit_stride) then
-                advance <= store_ready;
+                if(store_ready <= '1') then
+                    advance <= '1';
+                else
+                    advance <= '0';
+                    mem_time_out <= mem_time_out + 1;
+                end if;            
             else 
                 advance <= '1';
-            end if;
-            
+                mem_time_out <= 0;
+                time_out_i <= '0';
+            end if;  
+
             prev_state <= state;
-            prev_offset <= mem_offset_i;
-            if(advance = '1') then
+            prev_offset <= count_time_out;
+            if advance = '1' and mem_time_out < 10 then
             case op_cat is
               when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
                 if(unsigned(VLEN and num_ex) /= 0) THEN
@@ -203,6 +225,10 @@ begin
                 num_ex <= "00001";
               end if;
             end case;
+            elsif mem_time_out > 9 then 
+                time_out_i <= '1';
+                state   <= INSTR;
+                num_ex  <= "00001";
             end if;
             if(op_cat = OPMVV or op_cat = OPMVX) then
               REGW_1 <= REGR;
@@ -245,7 +271,7 @@ begin
         end case;
       end process;
 
-    control_signals: process(state,resetn,op_cat, ld_st_signal,op_v_signal,VSETIVLI_SIG)
+    control_signals: process(state,resetn,op_cat, ld_st_signal,op_v_signal,VSETIVLI_SIG,OP)
     begin
         if(resetn = '0') then
             mem_read <= '0';
@@ -293,7 +319,7 @@ begin
                 when NOP_CAT =>
                     -- advance <= '0';
                 -- macc funct6 = "101101"
-                when VL_unit_stride => -- Todo
+                when VL_unit_stride => -- Todo--this
                     wb_select <= '1';
                     case ld_st_signal.field3 is
                         when "00000" => null; -- unit-stride load
@@ -336,7 +362,7 @@ begin
                 --when OPIVV | OPIVX | OPIVI => null; 
                 --when OPFVV | OPFVF => null; -- not doing this
                 when OPMVV | OPMVX =>
-                    
+
 
                     wb_select <= '0';
                     if(state /= INSTR) then

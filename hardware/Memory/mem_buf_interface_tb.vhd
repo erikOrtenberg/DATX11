@@ -2,6 +2,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 USE ieee.std_logic_textio.all;
+use ieee.numeric_std.all;
 
 LIBRARY std;
 USE std.textio.all;
@@ -50,28 +51,74 @@ architecture Behavioral of mem_buf_interface_tb is
         );
     end component;
     
-    signal read_tkeep, write_tkeep                  : std_logic_vector(2 -1 downto 0);
+    signal read_tkeep                   : std_logic_vector(3 downto 0); 
+    signal write_tkeep                  : std_logic_vector(7 downto 0);
     signal read_tlast, read_tvalid, read_tready     : std_logic;
     signal write_tlast, write_tvalid, write_tready  : std_logic;
-    signal read_tdata, write_tdata                  : std_logic_vector(4-1 downto 0);
+    signal read_tdata                  : std_logic_vector(31 downto 0);
+    signal write_tdata                  : std_logic_vector(63 downto 0);
     signal clk, resetn: STD_LOGIC := '0';
 
-    signal buf_tkeep                                : std_logic_vector(2 -1 downto 0);
-    signal buf_tlast, buf_tvalid, buf_tready        : std_logic;
-    signal buf_tdata                                : std_logic_vector(4-1 downto 0);
-    FILE    vectorFile1: TEXT OPEN READ_MODE is "buf_interface.mif"; 
+
+    -- these are towards the vpu
+    signal store_data_in       : std_logic_vector (63 downto 0);
+    signal load_data_out       : std_logic_vector (63 downto 0);
+    signal load_last           : std_logic;
+    signal store_last          : std_logic;
+    signal load_keep           : std_logic_vector(7 downto 0);
+    signal store_keep          : std_logic_vector(7 downto 0);
+
+    -- set each enable to start a load/store
+    signal store_enable        : std_logic;
+    signal load_enable         : std_logic;
+    
+    -- these 2 make up the continue signal
+    signal store_ready         : std_logic;
+    signal load_valid          : std_logic;
 
     signal data_i : std_logic_vector(3 downto 0); 
-
 begin
-        
-    store_data_out <= load_data_in;
 
+    buf_interface : component mem_buf_interface
+    PORT MAP(
+        read_tkeep => read_tkeep,      -- out
+        read_tlast => read_tlast,           -- out
+        read_tdata => read_tdata,           -- out
+        read_tvalid => read_tvalid,         -- out
+        read_tready => read_tready,         -- in 
+
+        write_tkeep => write_tkeep,         -- in
+        write_tlast => write_tlast,         -- in
+        write_tdata => write_tdata,         -- in
+        write_tvalid => write_tvalid,       -- in
+        write_tready => write_tready,       -- out
+
+        -- these are towards the vpu
+        store_data_in  => store_data_in,
+        load_data_out  => load_data_out,
+        load_last => load_last,
+        store_last => store_last,
+        load_keep => load_keep,
+        store_keep => store_keep,
+            
+        -- set each enable to start a load/store
+        store_enable => store_enable,
+        load_enable => store_enable,
+                    
+        -- these 2 make up the continue signal
+        store_ready => store_ready,
+        load_valid => load_valid,
+        
+        clk => clk,        
+        resetn => resetn 
+    );
+
+    store_data_in <= load_data_out;
     store_last <= load_last;
-    store_keep <= load_last
+    store_keep <= load_keep;
     
     -- set each enable to start a load/store
-    store_enable < load_valid;
+    store_enable <= load_valid;
     load_enable <= store_ready;
     clk <= not clk after 10ns;
 
@@ -79,31 +126,44 @@ begin
         Variable vectorLine : LINE;
         Variable resultLine : LINE;
         Variable vectorValid : BOOLEAN;
-        Variable data : std_logic_vector(3 downto 0);
+        Variable data : std_logic_vector(7 downto 0);
         Variable space : character;
+        variable count : integer := 0;
+        variable security : integer := 0;
     begin
         write_tvalid <= '0';
 
+    
         wait until rising_edge(clk);
         read_tready <= '0';
         resetn<= '1';
 
-        while not endFile(vectorfile1) loop          
-                readline(vectorFile1,vectorLine);
-                read(vectorLine, data, good => vectorValid);
-                read(vectorLine,space);
-                wait until rising_edge(clk);
-                data_i <= data;
 
-                write_tvalid <= '1';
-        end LOOP;
+        while count < 10 and security < 10 loop          
+            wait until rising_edge(clk);
+                        if(write_tready = '1') then
+
+            write_tlast <= '0';
+            write_tkeep <= (others => '1');
+            write_tdata <= (others => '0');
+            write_tdata(7 downto 0) <= std_logic_vector(to_unsigned(count, 8));
+            write_tvalid <= '1';
+            count := count + 1;else security := security + 1;end if;
+        end LOOP;               
+        wait until rising_edge(clk);
+        write_tkeep <= (others => '1');
+        write_tdata <= (others => '0');
+        write_tlast <= '1';
+        write_tvalid <= '1';
+        count := 0;
 
         wait until rising_edge(clk);
         write_tvalid <= '0';
         read_tready <= '1';
 
-        while read_tvalid = '1' loop
+        while count < 30 loop
             wait until rising_edge(clk);
+            count := count + 1;
         end loop;
     
         ASSERT FALSE

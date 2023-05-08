@@ -34,7 +34,8 @@ entity lane is
       
       -- these 2 signals are how the mem interface tells the vpu to continue/stop
       store_ready         : in std_logic;
-      load_valid          : in std_logic
+      load_valid          : in std_logic;
+      time_out            : out std_logic   -- for when no data is found for load operations
 
   --todo add ports
   );
@@ -115,7 +116,7 @@ begin
       port map(
           clk             => clk, 
           resetn          => resetn,
-          OP              => op_code,
+          OP_in              => op_code,
           VLENB           => csigs.VL.VLB,
           VLEN            => csigs.VL.VL, 
           REG_A           => regASel,
@@ -142,7 +143,7 @@ begin
           store_ready     => store_ready,
            mem_offset    => mem_offset,
           wb_select       => wb_select,
-
+          time_out => time_out,
 
           DONE            => awaitingNewInstr
       );
