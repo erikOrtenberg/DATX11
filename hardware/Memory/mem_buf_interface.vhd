@@ -23,9 +23,9 @@ entity mem_buf_interface is
         -- these are towards the vpu
         store_data_in       : in std_logic_vector (63 downto 0);
         load_data_out       : out std_logic_vector (63 downto 0);
-        --load_last           : out std_logic;
-        --load_keep           : out std_logic_vector(7 downto 0);
-        --store_keep          : in std_logic_vector(7 downto 0);
+        load_last           : out std_logic;
+        load_keep           : out std_logic_vector(7 downto 0);
+        store_keep          : in std_logic_vector(7 downto 0);
         store_last          : in std_logic;
 
         -- set each enable to start a load/store
@@ -107,8 +107,8 @@ begin
         keep_size       => 8  -- nvm idk how this is calculated
     )
     port map(
-        read_tkeep      => open,
-        read_tlast      => open,   --this could be left as open too
+        read_tkeep      => load_keep,
+        read_tlast      => load_last,   --this could be left as open too
         read_tdata      => load_data_out,
         read_tvalid     => load_valid,
         read_tready     => load_enable,

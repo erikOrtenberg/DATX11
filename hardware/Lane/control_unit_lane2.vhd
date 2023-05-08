@@ -59,7 +59,6 @@ signal VSETIVLI_SIG  : VSETIVLI;
 
 signal num_ex       : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal count_time_out : STD_LOGIC_VECTOR(4 DOWNTO 0);
-signal prev_offset  : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal mem_offset_i : STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
@@ -151,45 +150,41 @@ begin
     --     '0' WHEN OTHERS;
 
     with op_cat SELECT mem_offset <=
-        count_time_out WHEN VL_unit_stride,
+        mem_offset_i WHEN VL_unit_stride,
         prev_offset  WHEN OTHERS; 
 
     time_out <= time_out_i;
 
-    count_time_out <= num_ex;
-    REGW <= REGR_1;
+    REGW <= REGW_1;
     REGR <= REGR_1;
+    advance_u : process(op_cat, load_valid, store_ready)
+    begin
+            if (op_cat = Vl_unit_stride) then 
+              advance <= load_valid;
+            elsif (op_cat = VS_unit_stride) then
+              advance <= store_ready;
+            else 
+                advance <= '1';
+            end if;  
+          end process;
+
     update_state: process(clk, resetn)
     begin
         if(resetn = '0') then 
-            advance <= '0';
             state   <= INSTR;
             num_ex  <= "00001";
             mem_time_out <= 0;
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
             op <= op_in;
-            if (op_cat = Vl_unit_stride) then 
-                if(load_valid <= '1') then
-                    advance <= '1';
-                else
-                    advance <= '0';
-                    mem_time_out <= mem_time_out + 1;
-                end if;
-            elsif (op_cat = VS_unit_stride) then
-                if(store_ready <= '1') then
-                    advance <= '1';
-                else
-                    advance <= '0';
-                    mem_time_out <= mem_time_out + 1;
-                end if;            
-            else 
-                advance <= '1';
-                mem_time_out <= 0;
-                time_out_i <= '0';
-            end if;  
+            if(advance = '0') then
+              mem_time_out <= mem_time_out + 1;
+            else
+              mem_time_out <= 0;
+              time_out_i <= '0';
+            end if;
 
             prev_state <= state;
-            prev_offset <= count_time_out;
+            prev_offset <= mem_offset_i;
             if advance = '1' and mem_time_out < 10 then
             case op_cat is
               when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
@@ -237,12 +232,7 @@ begin
                 state   <= INSTR;
                 num_ex  <= "00001";
             end if;
-            if(op_cat = OPMVV or op_cat = OPMVX) then
-              REGW_1 <= REGR;
-            else
-              REGW_1 <= '0';
-            end if;
-            REGW_IDX <= REGR_IDX;
+        REGW_IDX <= REGR_IDX;
         end if;
     end process;
 
@@ -321,6 +311,7 @@ begin
         wb_select <= '0';
         REGR_IDX <= (OTHERS => '0');
         REGR_1 <= '0';
+
         
             case op_cat is
                 when NOP_CAT =>
@@ -335,6 +326,8 @@ begin
                           if(state /= INSTR) then
                             MEM_READ <= '1';
                             REG_C    <= ld_st_signal.field1;
+                            REGR_1   <= '0';
+                            REGW_1   <= '1';
                             WB_WRITE_ENABLE <= '1';
                           end if;
                         
@@ -354,7 +347,7 @@ begin
                             REGR_1 <= '1';
                             V_USE_C   <= '1';
                             REG_C    <= ld_st_signal.field1;
-                          if(state /= EX1) then -- No memory writes in INSTR phase
+                          if(state /= INSTR) then -- No memory writes in INSTR phase
                             MEM_WRITE <= '1';
                           end if;
 
@@ -374,6 +367,7 @@ begin
                     wb_select <= '0';
                     if(state /= INSTR) then
                         REGR_1      <= '1';
+                        REGW_1      <= '1';
                     end if;
                     -- Register setup
 

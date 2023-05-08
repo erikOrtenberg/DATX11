@@ -42,23 +42,11 @@ begin
             registers <= (others => (others => (others => '0')));
         else
             if(rising_edge(clk)) then
-                if(outA_OE = '1') then
-                    outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
-                else 
-                    outA <= (others => 'U');
-                end if;
+               outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
                 
-                if(outB_OE = '1') then
-                    outB <= registers(to_integer(unsigned(regBSel)))(to_integer(unsigned(readRegSel)));
-                else 
-                    outB <= (others => 'U');
-                end if;
+               outB <= registers(to_integer(unsigned(regBSel)))(to_integer(unsigned(readRegSel)));
 
-                if(outC_OE = '1') then
-                    outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
-                else 
-                    outC <= (others => 'U');
-                end if;
+               outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
                 if(writeEnable = '1') then
                     registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= dataIn;
                 end if;
