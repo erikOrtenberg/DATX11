@@ -1,8 +1,0 @@
-Vivado Simulator v2022.2
-Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
-Running: /home/fredrik/Xilinx/Vivado/2022.2/bin/unwrapped/lnx64.o/xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L secureip --snapshot lane_testbench_behav xil_defaultlib.lane_testbench -log elaborate.log 
-Using 8 slave threads.
-Starting static elaboration
-WARNING: [VRFC 10-4940] 'div64' remains a black box since it has no binding entity [/home/fredrik/src/DATX11/hardware/Lane/ALU/ALU.vhd:46]
-Completed static elaboration
-ERROR: [XSIM 43-4187] File "/home/fredrik/src/DATX11/hardware/Lane/lane_testbench.vhd" Line 76 : The "Vhdl 2008 Force Assignment Statement" is not supported yet for simulation.

@@ -1,7 +1,0 @@
-Running: xsim.dir/lane_testbench_behav/xsimk -simmode gui -wdb lane_testbench_behav.wdb -simrunnum 0 -socket 34947
-Design successfully loaded
-Design Loading Memory Usage: 28868 KB (Peak: 29416 KB)
-Design Loading CPU Usage: 30 ms
-Simulation completed
-Simulation Memory Usage: 118804 KB (Peak: 168136 KB)
-Simulation CPU Usage: 500 ms
