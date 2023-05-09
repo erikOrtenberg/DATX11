@@ -1,0 +1,397 @@
+
+*** Running vivado
+    with args -log lane.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source lane.tcl
+
+
+****** Vivado v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source lane.tcl -notrace
+create_project: Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 1474.898 ; gain = 0.023 ; free physical = 636 ; free virtual = 7758
+Command: synth_design -top lane -part xc7z020clg400-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 141035
+INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [/home/fredrik/Xilinx/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
+---------------------------------------------------------------------------------
+Starting Synthesize : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1851.637 ; gain = 376.738 ; free physical = 180 ; free virtual = 7253
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1122.643; parent = 901.079; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3448.602; parent = 1851.641; children = 1596.961
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'lane' [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:45]
+INFO: [Synth 8-638] synthesizing module 'control_unit_lane' [/home/fredrik/src/DATX11/hardware/Lane/control_unit_lane2.vhd:41]
+	Parameter NR_OF_ADDR_BITS bound to: 5 - type: integer 
+	Parameter OP_LENGTH bound to: 32 - type: integer 
+	Parameter ALU_OP_LENGTH bound to: 2 - type: integer 
+INFO: [Synth 8-226] default block is never used [/home/fredrik/src/DATX11/hardware/Lane/control_unit_lane2.vhd:244]
+INFO: [Synth 8-226] default block is never used [/home/fredrik/src/DATX11/hardware/Lane/control_unit_lane2.vhd:404]
+INFO: [Synth 8-256] done synthesizing module 'control_unit_lane' (0#1) [/home/fredrik/src/DATX11/hardware/Lane/control_unit_lane2.vhd:41]
+INFO: [Synth 8-638] synthesizing module 'v_register_file' [/home/fredrik/src/DATX11/hardware/Registers/VRF.vhd:34]
+	Parameter MAX_VLEN bound to: 256 - type: integer 
+	Parameter bus_width bound to: 64 - type: integer 
+	Parameter nr_of_vectors bound to: 32 - type: integer 
+	Parameter nr_of_addr_bits bound to: 5 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'v_register_file' (0#1) [/home/fredrik/src/DATX11/hardware/Registers/VRF.vhd:34]
+INFO: [Synth 8-638] synthesizing module 'ctrlrg' [/home/fredrik/src/DATX11/hardware/Registers/CTRLRG.vhd:16]
+INFO: [Synth 8-256] done synthesizing module 'ctrlrg' (0#1) [/home/fredrik/src/DATX11/hardware/Registers/CTRLRG.vhd:16]
+INFO: [Synth 8-638] synthesizing module 'ALU' [/home/fredrik/src/DATX11/hardware/Lane/ALU/ALU.vhd:18]
+INFO: [Synth 8-3491] module 'macc64' declared at '/home/fredrik/src/DATX11/hardware/Lane/ALU/macc_stage.vhd:37' bound to instance 'macc' of component 'macc64' [/home/fredrik/src/DATX11/hardware/Lane/ALU/ALU.vhd:50]
+INFO: [Synth 8-638] synthesizing module 'macc64' [/home/fredrik/src/DATX11/hardware/Lane/ALU/macc_stage.vhd:44]
+INFO: [Synth 8-256] done synthesizing module 'macc64' (0#1) [/home/fredrik/src/DATX11/hardware/Lane/ALU/macc_stage.vhd:44]
+INFO: [Synth 8-3491] module 'add64' declared at '/home/fredrik/src/DATX11/hardware/Lane/ALU/add64.vhd:35' bound to instance 'add' of component 'add64' [/home/fredrik/src/DATX11/hardware/Lane/ALU/ALU.vhd:51]
+INFO: [Synth 8-638] synthesizing module 'add64' [/home/fredrik/src/DATX11/hardware/Lane/ALU/add64.vhd:41]
+INFO: [Synth 8-256] done synthesizing module 'add64' (0#1) [/home/fredrik/src/DATX11/hardware/Lane/ALU/add64.vhd:41]
+INFO: [Synth 8-256] done synthesizing module 'ALU' (0#1) [/home/fredrik/src/DATX11/hardware/Lane/ALU/ALU.vhd:18]
+INFO: [Synth 8-256] done synthesizing module 'lane' (0#1) [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:45]
+WARNING: [Synth 8-6014] Unused sequential element prev_state_reg was removed.  [/home/fredrik/src/DATX11/hardware/Lane/control_unit_lane2.vhd:186]
+WARNING: [Synth 8-3848] Net write_csr in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:82]
+WARNING: [Synth 8-3848] Net csigs_u[VTYPE][vill] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VTYPE][reserved] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VTYPE][vma] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VTYPE][vta] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VTYPE][vsew] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VTYPE][vlmul] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[vstart][vstart] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VXRM][reserved] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VXRM][roundmode] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VXSAT][reserved] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VXSAT][sat] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VCSR][vxrm] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-3848] Net csigs_u[VCSR][vxsat] in module/entity lane does not have driver. [/home/fredrik/src/DATX11/hardware/Lane/lane.vhd:81]
+WARNING: [Synth 8-7129] Port update[VTYPE][vill] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][54] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][53] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][52] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][51] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][50] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][49] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][48] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][47] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][46] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][45] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][44] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][43] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][42] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][41] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][40] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][39] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][38] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][37] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][36] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][35] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][34] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][33] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][32] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][31] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][30] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][29] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][28] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][27] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][26] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][25] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][24] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][23] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][22] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][21] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][20] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][19] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][18] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][17] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][16] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][15] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][14] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][13] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][12] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][11] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][10] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][9] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][8] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][7] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][6] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][5] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][4] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][3] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][2] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][1] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][reserved][0] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vma] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vta] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vsew][2] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vsew][1] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vsew][0] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vlmul][2] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vlmul][1] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VTYPE][vlmul][0] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][8] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][7] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][6] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][5] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][4] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][3] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][2] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][1] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[vstart][vstart][0] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][63] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][62] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][61] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][60] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][59] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][58] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][57] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][56] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][55] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][54] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][53] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][52] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][51] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][50] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][49] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][48] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][47] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][46] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][45] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][44] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][43] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][42] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][41] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][40] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][39] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][38] in module ctrlrg is either unconnected or has no load
+WARNING: [Synth 8-7129] Port update[VXRM][reserved][37] in module ctrlrg is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished Synthesize : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1939.605 ; gain = 464.707 ; free physical = 302 ; free virtual = 7318
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1122.643; parent = 901.079; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3536.570; parent = 1939.609; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 1957.418 ; gain = 482.520 ; free physical = 280 ; free virtual = 7296
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1122.643; parent = 901.079; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3554.383; parent = 1957.422; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7z020clg400-1
+---------------------------------------------------------------------------------
+INFO: [Device 21-403] Loading part xc7z020clg400-1
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 1965.422 ; gain = 490.523 ; free physical = 276 ; free virtual = 7292
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1122.643; parent = 901.079; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3562.387; parent = 1965.426; children = 1596.961
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-327] inferring latch for variable 'REGW_1_reg' [/home/fredrik/src/DATX11/hardware/Lane/control_unit_lane2.vhd:158]
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:12 ; elapsed = 00:00:12 . Memory (MB): peak = 1989.445 ; gain = 514.547 ; free physical = 157 ; free virtual = 7205
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1152.383; parent = 930.819; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3586.410; parent = 1989.449; children = 1596.961
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input    8 Bit       Adders := 16    
++---Registers : 
+	               64 Bit    Registers := 131   
+	               32 Bit    Registers := 1     
+	                5 Bit    Registers := 3     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 4     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   4 Input   64 Bit        Muxes := 3     
+	   2 Input   64 Bit        Muxes := 3     
+	   2 Input    5 Bit        Muxes := 12    
+	   6 Input    5 Bit        Muxes := 4     
+	   4 Input    5 Bit        Muxes := 2     
+	   5 Input    5 Bit        Muxes := 1     
+	   3 Input    5 Bit        Muxes := 2     
+	  11 Input    4 Bit        Muxes := 1     
+	   3 Input    3 Bit        Muxes := 1     
+	   2 Input    3 Bit        Muxes := 4     
+	   4 Input    3 Bit        Muxes := 1     
+	   3 Input    2 Bit        Muxes := 1     
+	   4 Input    2 Bit        Muxes := 3     
+	   2 Input    2 Bit        Muxes := 3     
+	   2 Input    1 Bit        Muxes := 141   
+	   3 Input    1 Bit        Muxes := 1     
+	   7 Input    1 Bit        Muxes := 3     
+	   6 Input    1 Bit        Muxes := 9     
+	   4 Input    1 Bit        Muxes := 2     
+	   5 Input    1 Bit        Muxes := 1     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 220 (col length:60)
+BRAMs: 280 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:53 ; elapsed = 00:00:56 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 569 ; free virtual = 6795
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:58 ; elapsed = 00:01:02 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 548 ; free virtual = 6789
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:04 ; elapsed = 00:01:08 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 560 ; free virtual = 6780
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:11 ; elapsed = 00:01:15 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 568 ; free virtual = 6789
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:11 ; elapsed = 00:01:16 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 568 ; free virtual = 6788
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:11 ; elapsed = 00:01:16 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 567 ; free virtual = 6788
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:12 ; elapsed = 00:01:16 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 567 ; free virtual = 6788
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:12 ; elapsed = 00:01:17 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 567 ; free virtual = 6788
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:12 ; elapsed = 00:01:17 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 567 ; free virtual = 6788
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |BUFG   |     1|
+|2     |CARRY4 |    72|
+|3     |LUT1   |     3|
+|4     |LUT2   |   203|
+|5     |LUT3   |   101|
+|6     |LUT4   |   183|
+|7     |LUT5   |    46|
+|8     |LUT6   |  7470|
+|9     |MUXF7  |  3072|
+|10    |MUXF8  |   384|
+|11    |FDCE   |  8231|
+|12    |FDPE   |     5|
+|13    |FDRE   |   224|
+|14    |LD     |     1|
+|15    |IBUF   |   129|
+|16    |OBUF   |    69|
++------+-------+------+
+
+Report Instance Areas: 
++------+---------+------------------+------+
+|      |Instance |Module            |Cells |
++------+---------+------------------+------+
+|1     |top      |                  | 20194|
+|2     |  alu0   |ALU               |   172|
+|3     |    macc |macc64            |   172|
+|4     |  creg   |ctrlrg            |     4|
+|5     |  ctrl   |control_unit_lane |   574|
+|6     |  vreg   |v_register_file   | 19245|
++------+---------+------------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:12 ; elapsed = 00:01:17 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 567 ; free virtual = 6788
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1518.598; parent = 1297.065; children = 221.563
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 4125.176; parent = 2528.215; children = 1596.961
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 229 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:12 ; elapsed = 00:01:17 . Memory (MB): peak = 2528.211 ; gain = 1053.312 ; free physical = 571 ; free virtual = 6792
+Synthesis Optimization Complete : Time (s): cpu = 00:01:12 ; elapsed = 00:01:17 . Memory (MB): peak = 2528.219 ; gain = 1053.312 ; free physical = 571 ; free virtual = 6792
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00.18 ; elapsed = 00:00:00.18 . Memory (MB): peak = 2528.219 ; gain = 0.000 ; free physical = 677 ; free virtual = 6908
+INFO: [Netlist 29-17] Analyzing 3529 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+WARNING: [Netlist 29-101] Netlist 'lane' is not ideal for floorplanning, since the cellview 'v_register_file' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2576.234 ; gain = 0.000 ; free physical = 575 ; free virtual = 6822
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 1 instances were transformed.
+  LD => LDCE: 1 instance 
+
+Synth Design complete, checksum: 90d345ff
+INFO: [Common 17-83] Releasing license: Synthesis
+32 Infos, 118 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:01:24 ; elapsed = 00:01:25 . Memory (MB): peak = 2576.234 ; gain = 1101.336 ; free physical = 795 ; free virtual = 7043
+INFO: [Common 17-1381] The checkpoint '/home/fredrik/src/DATX11/VPu/VPu.runs/synth_1/lane.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file lane_utilization_synth.rpt -pb lane_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Tue May  9 14:06:56 2023...

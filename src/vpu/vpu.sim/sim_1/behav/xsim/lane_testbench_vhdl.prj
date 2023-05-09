@@ -1,0 +1,16 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../../../hardware/Lane/ALU/ALU.vhd" \
+"../../../../../../hardware/common_pkg.vhd" \
+"../../../../../../hardware/Lane/FSM.vhd" \
+"../../../../../../hardware/Registers/VRF.vhd" \
+"../../../../../../hardware/Lane/ALU/add64.vhd" \
+"../../../../../../hardware/Lane/control_unit_lane.vhd" \
+"../../../../../../hardware/Lane/lane.vhd" \
+"../../../../../../hardware/Lane/ALU/macc_stage.vhd" \
+
+vhdl2008 xil_defaultlib  \
+"../../../../../../hardware/Lane/lane_testbench.vhd" \
+
+# Do not sort compile order
+nosort

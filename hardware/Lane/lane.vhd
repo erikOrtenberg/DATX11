@@ -89,6 +89,7 @@ architecture v1 of lane is
   signal C_i : std_logic_vector(bus_width - 1 downto 0);
   signal done_cn  : std_logic_vector(2 DOWNTO 0);
   signal ni  : std_logic;
+  signal store_lasti    : std_logic;
 
   -- Scalar register signals
 
@@ -145,6 +146,7 @@ begin
           write_vl        => write_vl,
           load_valid      => load_valid,
           store_ready     => store_ready,
+          store_last      => store_lasti,
           mem_offset    => mem_offset,
           wb_select       => wb_select,
           done_cnt         => done_cn,
@@ -161,8 +163,7 @@ begin
     mem_data_out <= load_data;
          
     -- needs to be set at the end of each memory operation
-    store_last <= mem_last;
-    mem_last <= awaitingNewInstr and mem_write;
+    store_last <= store_lasti;
          
     -- these signals tell the memory to load/store
     store_enable        <= mem_write;
