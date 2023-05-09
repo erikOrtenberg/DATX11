@@ -187,7 +187,7 @@ begin
 
             prev_state <= state;
             prev_offset <= mem_offset_i;
-            if advance = '1' and mem_time_out < 10 then
+            if advance = '1' and mem_time_out < 1000000 then
                 case op_cat is
                   when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
                     if(unsigned(VLEN and num_ex) /= 0) THEN
@@ -235,7 +235,7 @@ begin
                     num_ex <= "00001";
                   end if;
                 end case;
-            elsif mem_time_out > 9 then 
+            elsif mem_time_out >= 1000000 then 
                 time_out_i <= '1';
                 state   <= INSTR;
                 num_ex  <= "00001";
