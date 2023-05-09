@@ -16,8 +16,9 @@ entity lane is
   port(
       clk                 : in std_logic;
       RESETN              : in std_logic;
-      op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
-      x_reg_in      : in std_logic_vector(nr_of_mem_addr_bits-1   DOWNTO 0);
+      op_code		          : in std_logic_vector(op_length-1 DOWNTO 0);
+      x_reg_in            : in std_logic_vector(nr_of_mem_addr_bits-1   DOWNTO 0);
+      new_ins             : in std_logic;
 
       done		        : out std_logic;
         
@@ -87,6 +88,7 @@ architecture v1 of lane is
 
   signal C_i : std_logic_vector(bus_width - 1 downto 0);
   signal done_cn  : std_logic_vector(2 DOWNTO 0);
+  signal ni  : std_logic;
 
   -- Scalar register signals
 
@@ -146,6 +148,7 @@ begin
           mem_offset    => mem_offset,
           wb_select       => wb_select,
           done_cnt         => done_cn,
+          ni              => ni,
           time_out => time_out,
 
           DONE            => awaitingNewInstr
@@ -168,6 +171,7 @@ begin
     -- left as or for now
     mem_ready <= store_ready or load_valid;
     done_cnt <= done_cn;
+    ni        <= new_ins;
  
  
     --mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);

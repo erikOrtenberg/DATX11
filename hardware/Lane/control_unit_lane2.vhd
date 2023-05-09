@@ -18,6 +18,7 @@ ENTITY control_unit_lane IS
         store_ready             : in std_logic;
         VLENB                   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
         VLEN                    : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+        ni                      : IN STD_LOGIC;
         REG_A,REG_B,REG_C       : OUT STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
         V_USE_A,V_USE_B,V_USE_C : OUT STD_LOGIC;
         X_USE_A,X_USE_B,X_USE_C : OUT STD_LOGIC;
@@ -63,6 +64,8 @@ signal count_time_out : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal mem_offset_i : STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal done_cn      : unsigned(2 DOWNTO 0);
+signal done_i       : STD_LOGIC;
+signal new_instr    : STD_LOGIC;
 
 --output registers
 --signal REG_A_i,REG_B_i,REG_C_i       : STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
@@ -123,33 +126,9 @@ begin
         ST_FP       when others; -- "0100111";
         
 
-    with state select DONE <=
-        '1' when INSTR,
-        '0' when others; 
-
-    -- with state select REGR_IDX <=
-    --     "00" when EX1,
-    --     "01" when EX2,
-    --     "10" when EX3,
-    --     "11" when others;  
-
-    -- with state select REGR <=
-    --     '0' when INSTR,
-    --     '1' when others;
-
-    -- with prev_state select REGW_IDX <=
-    --     "00" when EX1,
-    --     "01" when EX2,
-    --     "10" when EX3,
-    --     "11" when others;  
-    -- 
-    -- with prev_state select REGW_1 <=
-    --     '0' when INSTR,
-    --     '1' when others;
-
-    -- with op_cat SELECT REGW <= 
-    --     REGW_1 WHEN OPMVV | OPMVX | VL_unit_stride,
-    --     '0' WHEN OTHERS;
+    -- with state select DONE <=
+    --     '1' when INSTR,
+    --     '0' when others; 
 
     with op_cat SELECT mem_offset <=
         mem_offset_i WHEN VL_unit_stride,
@@ -160,8 +139,14 @@ begin
     REGW <= REGW_1;
     REGR <= REGR_1;
     done_cnt <= STD_LOGIC_VECTOR(done_cn);
+    new_instr <= ni;
+    done <= done_i;
     advance_u : process(op_cat, load_valid, store_ready)
     begin
+        case state is
+          WHEN INSTR => 
+            advance <= new_instr and done;
+          when OTHERS =>
             if (op_cat = Vl_unit_stride) then 
               advance <= load_valid;
             elsif (op_cat = VS_unit_stride) then
@@ -169,7 +154,8 @@ begin
             else 
                 advance <= '1';
             end if;  
-          end process;
+        end case;
+    end process;
 
     update_state: process(clk, resetn)
     begin
@@ -190,50 +176,51 @@ begin
             prev_state <= state;
             prev_offset <= mem_offset_i;
             if advance = '1' and mem_time_out < 10 then
-            case op_cat is
-              when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
-                if(unsigned(VLEN and num_ex) /= 0) THEN
-                  CASE state IS
-                    when INSTR  =>
-                        state <= EX1;
-                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
-                        mem_offset_i <= "00";
-                        done_cn <= done_cn + 1;
-                        --report "Trying to exit instr phase with multi cycli op code" Severity note;
-                    when EX1    =>
-                        state <= EX2;
-                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
-                        mem_offset_i <= "01";
-                    when EX2    =>
-                        state <= EX3;
-                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
-                        mem_offset_i <= "10";
-                    when EX3    =>
-                        state <= EX4;
-                        num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
-                        mem_offset_i <= "11";
-                    when OTHERS => 
-                        state <= INSTR;
-                        num_ex <= "00001";
-                        mem_offset_i <= "00";
-                  end CASE;
-                else
-                  state <= INSTR;
-                  done_cn <= done_cn + 1;
-                  num_ex <= "00001";
-                end if;
-            when OTHERS =>
-              if(state = INSTR) THEN
-                --report "Trying to exit instr phase with single cycli op code" Severity note;
-                state <= EX1;
-                done_cn <= done_cn + 1;
-                num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
-              else
-                --report "Trying to return to instr phase with single cycle instruction " Severity note;
-                state <= INSTR;
-                num_ex <= "00001";
-              end if;
-            end case;
+                case op_cat is
+                  when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
+                    if(unsigned(VLEN and num_ex) /= 0) THEN
+                      CASE state IS
+                        when INSTR  =>
+                            state <= EX1;
+                            num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                            mem_offset_i <= "00";
+                            done_cn <= done_cn + 1;
+                            done_i <= not done_i;
+                            --report "Trying to exit instr phase with multi cycli op code" Severity note;
+                        when EX1    =>
+                            state <= EX2;
+                            num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                            mem_offset_i <= "01";
+                        when EX2    =>
+                            state <= EX3;
+                            num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                            mem_offset_i <= "10";
+                        when EX3    =>
+                            state <= EX4;
+                            num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                            mem_offset_i <= "11";
+                        when OTHERS => 
+                            state <= INSTR;
+                            num_ex <= "00001";
+                            mem_offset_i <= "00";
+                      end CASE;
+                    else
+                      state <= INSTR;
+                      num_ex <= "00001";
+                    end if;
+                when OTHERS =>
+                  if(state = INSTR) THEN
+                    --report "Trying to exit instr phase with single cycli op code" Severity note;
+                    state <= EX1;
+                    done_cn <= done_cn + 1;
+                    done_i <= not done_i;
+                    num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
+                  else
+                    --report "Trying to return to instr phase with single cycle instruction " Severity note;
+                    state <= INSTR;
+                    num_ex <= "00001";
+                  end if;
+                end case;
             elsif mem_time_out > 9 then 
                 time_out_i <= '1';
                 state   <= INSTR;
