@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="impl_1" LaunchPart="xc7k70tfbv676-1" LaunchTime="1677869380">
+  <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
+  <File Type="ROUTE-RQS-RPT" Name="route_report_qor_suggestions_0.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-RQS" Name="FA_postroute_physopted.rqs"/>
+  <File Type="ROUTE-RQS" Name="FA_routed.rqs"/>
+  <File Type="RBD_FILE" Name="FA.rbd"/>
+  <File Type="NPI_FILE" Name="FA.npi"/>
+  <File Type="RNPI_FILE" Name="FA.rnpi"/>
+  <File Type="CFI_FILE" Name="FA.cfi"/>
+  <File Type="RCFI_FILE" Name="FA.rcfi"/>
+  <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
+  <File Type="BITSTR-LTX" Name="FA.ltx"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="FA_postroute_physopt_bb.dcp"/>
+  <File Type="BITSTR-SYSDEF" Name="FA.sysdef"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="FA_postroute_physopt.dcp"/>
+  <File Type="BITSTR-MMI" Name="FA.mmi"/>
+  <File Type="BITSTR-BMM" Name="FA_bd.bmm"/>
+  <File Type="PHYSOPT-DCP" Name="FA_physopt.dcp"/>
+  <File Type="BG-BGN" Name="FA.bgn"/>
+  <File Type="OPT-DCP" Name="FA_opt.dcp"/>
+  <File Type="OPT-HWDEF" Name="FA.hwdef"/>
+  <File Type="BG-BIT" Name="FA.bit"/>
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="PA-TCL" Name="FA.tcl"/>
+  <File Type="REPORTS-TCL" Name="FA_reports.tcl"/>
+  <File Type="BG-DRC" Name="FA.drc"/>
+  <File Type="PDI-FILE" Name="FA.pdi"/>
+  <File Type="RDI-RDI" Name="FA.vdi"/>
+  <File Type="BG-BIN" Name="FA.bin"/>
+  <File Type="PLACE-DCP" Name="FA_placed.dcp"/>
+  <File Type="BITSTR-MSK" Name="FA.msk"/>
+  <File Type="PWROPT-DCP" Name="FA_pwropt.dcp"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="FA_incremental_reuse_pre_placed.rpt"/>
+  <File Type="BITSTR-RBT" Name="FA.rbt"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="FA_postplace_pwropt.dcp"/>
+  <File Type="BITSTR-NKY" Name="FA.nky"/>
+  <File Type="ROUTE-DCP" Name="FA_routed.dcp"/>
+  <File Type="ROUTE-ERROR-DCP" Name="FA_routed_error.dcp"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="FA_routed_bb.dcp"/>
+  <File Type="ROUTE-TIMING-PB" Name="FA_timing_summary_routed.pb"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PPRDIR/../../hardware/Plane/ALU/FA.vhd">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hardware/Plane/FSM.vhd">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/macc_stage.vhd">
+      <FileInfo SFType="VHDL2008">
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hardware/Plane/ALU/ALU.vhd">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/lanefsm.vhd">
+      <FileInfo SFType="VHDL2008">
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hardware/Plane/ALU/CSAdder.vhd">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../hardware/Plane/ALU/MUX.vhd">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="FA"/>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
+    <Filter Type="Utils"/>
+    <File Path="$PSRCDIR/utils_1/imports/synth_1/macc32.dcp">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedInSteps" Val="synth_1"/>
+        <Attr Name="UsedInSteps" Val="synth_1_copy_1"/>
+        <Attr Name="AutoDcp" Val="1"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2022"/>
+    <Step Id="init_design"/>
+    <Step Id="opt_design"/>
+    <Step Id="power_opt_design"/>
+    <Step Id="place_design"/>
+    <Step Id="post_place_power_opt_design"/>
+    <Step Id="phys_opt_design"/>
+    <Step Id="route_design"/>
+    <Step Id="post_route_phys_opt_design"/>
+    <Step Id="write_bitstream"/>
+    <Step Id="write_device_image"/>
+  </Strategy>
+</GenRun>
