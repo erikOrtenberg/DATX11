@@ -38,15 +38,13 @@ signal registers : registerFile;
 begin
     regFile: process(clk, resetn)
     begin
+        outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
+        outB <= registers(to_integer(unsigned(regBSel)))(to_integer(unsigned(readRegSel)));
+        outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
         if(resetn = '0') then
             registers <= (others => (others => (others => '0')));
         else
             if(rising_edge(clk)) then
-               outA <= registers(to_integer(unsigned(regASel)))(to_integer(unsigned(readRegSel)));
-                
-               outB <= registers(to_integer(unsigned(regBSel)))(to_integer(unsigned(readRegSel)));
-
-               outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
                 if(writeEnable = '1') then
                     registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= dataIn;
                 end if;
