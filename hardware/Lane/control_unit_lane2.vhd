@@ -436,6 +436,9 @@ begin
                 REGR_IDX <= "00";
             end case;
         end if;
+        if(advance = '0') then
+          MEM_READ <= '0';
+        end if;
     end process; 
 end v2;
 
