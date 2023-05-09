@@ -84,7 +84,6 @@ architecture v2 of mem_buf_interface_tb is
     signal do_load             : std_logic;
 
     signal data_i : std_logic_vector(3 downto 0); 
-    signal new_ins            : std_logic;
 begin
 
     buf_interface : component mem_buf_interface
@@ -127,7 +126,6 @@ begin
         resetn => resetn,
         op_code => op_code,
         x_reg_in => x_reg_in,
-        new_ins => new_ins,
         done => done,
         store_last => store_last,
         store_data => store_data_in,
@@ -136,8 +134,7 @@ begin
         load_enable => load_enable,
         store_ready => store_ready,
         load_valid => do_load,
-        time_out  => time_out,
-        done_cnt => open
+        time_out  => time_out
         );
 
     
@@ -154,9 +151,6 @@ begin
         variable security : integer := 0;
     begin
         write_tvalid <= '0';
-        resetn <= '1';
-        wait for 10ns;
-        resetn <= '0';
 
     
         wait until rising_edge(clk);
@@ -164,7 +158,6 @@ begin
         resetn<= '1';
 
         do_load <= '0';
-        new_ins <= '1';
 
 
         while count < 10 and security < 10 loop          
@@ -178,8 +171,8 @@ begin
             write_tvalid <= '1';
             count := count + 1;else security := security + 1;end if;
         end LOOP;               
+        wait until done = '1';
         op_code <= "00000000100000000000000010000111";
-        new_ins <= not new_ins;
         x_reg_in <= (OTHERS => '0');
         do_load <= load_valid;
         write_tkeep <= (others => '1');
@@ -188,17 +181,15 @@ begin
         write_tvalid <= '1';
         count := 0;
 
-        wait on done;
+        wait until done = '1';
         op_code <= "00000000100000000000000100000111";
-        new_ins <= not new_ins;
-        wait on done;
+        wait until done = '1';   
         op_code <= "10110100000100010010000001010111";
-        new_ins <= not new_ins;
-        wait on done;
+        wait until done = '1';   
         op_code <= "00000000100000000000000000100111";
-        new_ins <= not new_ins;
         read_tready <= '1';
-        wait on done;
+        wait until done = '1';
+        op_code <= (OTHERS => '0');
 
 
 

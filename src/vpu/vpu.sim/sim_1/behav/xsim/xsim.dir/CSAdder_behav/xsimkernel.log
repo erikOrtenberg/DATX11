@@ -1,7 +1,0 @@
-Running: xsim.dir/CSAdder_behav/xsimk -simmode gui -wdb CSAdder_behav.wdb -simrunnum 0 -socket 52293
-Design successfully loaded
-Design Loading Memory Usage: 28840 KB (Peak: 29388 KB)
-Design Loading CPU Usage: 30 ms
-Simulation completed
-Simulation Memory Usage: 110576 KB (Peak: 168108 KB)
-Simulation CPU Usage: 30 ms

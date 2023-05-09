@@ -36,8 +36,7 @@ ENTITY control_unit_lane IS
         wb_select               : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC;
         done_cnt                : out std_logic_vector(2 DOWNTO 0);
-        time_out                : out std_logic;
-        store_last              : out std_logic
+        time_out                : out std_logic
     );
 end control_unit_lane;
 
@@ -142,15 +141,11 @@ begin
     done_cnt <= STD_LOGIC_VECTOR(done_cn);
     new_instr <= ni;
     done <= done_i;
-    advance_u : process(op_cat, load_valid, store_ready,new_instr,done_i,num_ex,vlen)
+    advance_u : process(op_cat, load_valid, store_ready)
     begin
         case state is
           WHEN INSTR => 
-            if new_instr = done_i then
-              advance <= '1';
-            else
-              advance <= '0';
-            end if;
+            advance <= new_instr and done;
           when OTHERS =>
             if (op_cat = Vl_unit_stride) then 
               advance <= load_valid;
@@ -160,13 +155,6 @@ begin
                 advance <= '1';
             end if;  
         end case;
-
-        if(unsigned(vlen and num_ex) /= 0) THEN
-          store_last <= '0';
-        else
-          store_last <= '1';
-        end if;
-
     end process;
 
     update_state: process(clk, resetn)
@@ -176,8 +164,8 @@ begin
             num_ex  <= "00001";
             mem_time_out <= 0;
             done_cn <= (OTHERS=>'0');
-            done_i  <= '0';
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
+            op <= op_in;
             if(advance = '0') then
               mem_time_out <= mem_time_out + 1;
             else
@@ -198,7 +186,6 @@ begin
                             mem_offset_i <= "00";
                             done_cn <= done_cn + 1;
                             done_i <= not done_i;
-                            op <= op_in;
                             --report "Trying to exit instr phase with multi cycli op code" Severity note;
                         when EX1    =>
                             state <= EX2;
@@ -228,7 +215,6 @@ begin
                     done_cn <= done_cn + 1;
                     done_i <= not done_i;
                     num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
-                    op <= op_in;
                   else
                     --report "Trying to return to instr phase with single cycle instruction " Severity note;
                     state <= INSTR;
@@ -319,7 +305,6 @@ begin
         wb_select <= '0';
         REGR_IDX <= (OTHERS => '0');
         REGR_1 <= '0';
-        REGW_1 <= '0';
 
         
             case op_cat is
