@@ -35,6 +35,7 @@ entity lane is
       -- these 2 signals are how the mem interface tells the vpu to continue/stop
       store_ready         : in std_logic;
       load_valid          : in std_logic;
+      done_cnt            : out std_logic_vector(2 DOWNTO 0);
       time_out            : out std_logic   -- for when no data is found for load operations
 
   --todo add ports
@@ -85,6 +86,7 @@ architecture v1 of lane is
   signal mem_last : std_logic;
 
   signal C_i : std_logic_vector(bus_width - 1 downto 0);
+  signal done_cn  : std_logic_vector(2 DOWNTO 0);
 
   -- Scalar register signals
 
@@ -143,6 +145,7 @@ begin
           store_ready     => store_ready,
           mem_offset    => mem_offset,
           wb_select       => wb_select,
+          done_cnt         => done_cn,
           time_out => time_out,
 
           DONE            => awaitingNewInstr
@@ -164,6 +167,7 @@ begin
          
     -- left as or for now
     mem_ready <= store_ready or load_valid;
+    done_cnt <= done_cn;
  
  
     --mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);

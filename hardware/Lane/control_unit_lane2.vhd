@@ -34,6 +34,7 @@ ENTITY control_unit_lane IS
         mem_offset              : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         wb_select               : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC;
+        done_cnt                : out std_logic_vector(2 DOWNTO 0);
         time_out                : out std_logic
     );
 end control_unit_lane;
@@ -61,6 +62,7 @@ signal num_ex       : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal count_time_out : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal mem_offset_i : STD_LOGIC_VECTOR(1 DOWNTO 0);
 signal prev_offset  : STD_LOGIC_VECTOR(1 DOWNTO 0);
+signal done_cn      : unsigned(2 DOWNTO 0);
 
 --output registers
 --signal REG_A_i,REG_B_i,REG_C_i       : STD_LOGIC_VECTOR(NR_OF_ADDR_BITS - 1 DOWNTO 0);
@@ -157,6 +159,7 @@ begin
 
     REGW <= REGW_1;
     REGR <= REGR_1;
+    done_cnt <= STD_LOGIC_VECTOR(done_cn);
     advance_u : process(op_cat, load_valid, store_ready)
     begin
             if (op_cat = Vl_unit_stride) then 
@@ -174,6 +177,7 @@ begin
             state   <= INSTR;
             num_ex  <= "00001";
             mem_time_out <= 0;
+            done_cn <= (OTHERS=>'0');
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
             op <= op_in;
             if(advance = '0') then
@@ -194,6 +198,7 @@ begin
                         state <= EX1;
                         num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                         mem_offset_i <= "00";
+                        done_cn <= done_cn + 1;
                         --report "Trying to exit instr phase with multi cycli op code" Severity note;
                     when EX1    =>
                         state <= EX2;
@@ -214,12 +219,14 @@ begin
                   end CASE;
                 else
                   state <= INSTR;
+                  done_cn <= done_cn + 1;
                   num_ex <= "00001";
                 end if;
             when OTHERS =>
               if(state = INSTR) THEN
                 --report "Trying to exit instr phase with single cycli op code" Severity note;
                 state <= EX1;
+                done_cn <= done_cn + 1;
                 num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
               else
                 --report "Trying to return to instr phase with single cycle instruction " Severity note;
