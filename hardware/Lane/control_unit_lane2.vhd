@@ -345,6 +345,7 @@ begin
 
                         when "01000" => -- unit-stride, whole register store
                             REGR_1 <= '1';
+                            REGW_1 <= '0';
                             V_USE_C   <= '1';
                             REG_C    <= ld_st_signal.field1;
                           if(state /= INSTR) then -- No memory writes in INSTR phase
@@ -399,6 +400,7 @@ begin
                     if(state /= INSTR) THEN
                        WRITE_VL <= '1';
                      end if;
+                     REGW_1 <= '0';
                     CASE? OP(31 DOWNTO 30) is
                         when "0-" => NULL; -- VSETVLI
                         WHEN "11" =>       -- VSETIVLI
@@ -411,7 +413,7 @@ begin
                         WHEN OTHERS => NULL;
                     end CASE?;
                         
-                when others => null;
+                when others => REGW_1 <= '0';
             end case;
 
             case state is
