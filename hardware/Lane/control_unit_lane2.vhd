@@ -240,7 +240,9 @@ begin
                 state   <= INSTR;
                 num_ex  <= "00001";
             end if;
-        REGW_IDX <= REGR_IDX;
+            if(advance = '1') then
+                REGW_IDX <= REGR_IDX;
+            end if;
         end if;
     end process;
 
@@ -276,7 +278,7 @@ begin
         end case;
       end process;
 
-    control_signals: process(state,resetn,op_cat, ld_st_signal,op_v_signal,VSETIVLI_SIG,OP)
+    control_signals: process(state,resetn,op_cat, ld_st_signal,op_v_signal,VSETIVLI_SIG,OP,advance)
     begin
         if(resetn = '0') then
             mem_read <= '0';
@@ -333,13 +335,13 @@ begin
 
                         when "01000" =>  -- unit-stride, whole register load
                           if(state /= INSTR) then
-                            MEM_READ <= '1';
                             REG_C    <= ld_st_signal.field1;
                             REGR_1   <= '0';
                             REGW_1   <= '1';
                             WB_WRITE_ENABLE <= '1';
+                            MEM_READ <= advance;
                           end if;
-                        
+
                         when "01011" => null; -- unit-stride, mask load, EEW=8
                         
                         when "10000" => null; -- unit-stride fault-only-first
@@ -435,9 +437,6 @@ begin
               WHEN OTHERS =>
                 REGR_IDX <= "00";
             end case;
-        end if;
-        if(advance = '0') then
-          MEM_READ <= '0';
         end if;
     end process; 
 end v2;

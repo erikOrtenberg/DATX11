@@ -143,6 +143,7 @@ begin
     
     -- set each enable to start a load/store
     clk <= not clk after 10 ns;
+    do_load <= load_valid;
 
     testing: process
         Variable vectorLine : LINE;
@@ -163,25 +164,32 @@ begin
         read_tready <= '0';
         resetn<= '1';
 
-        do_load <= '0';
         new_ins <= '1';
+        op_code <= "00000000100000000000000010000111";
+        wait for 15ns;
+        new_ins <= not new_ins;
+        wait on done;
+        
 
 
         while count < 10 and security < 10 loop          
             wait until rising_edge(clk);
                         if(write_tready = '1') then
 
+            write_tvalid <= '0';
+            wait for 20 ns;
             write_tlast <= '0';
             write_tkeep <= (others => '1');
             write_tdata <= (others => '0');
             write_tdata(7 downto 0) <= std_logic_vector(to_unsigned(count+7, 8));
             write_tvalid <= '1';
             count := count + 1;else security := security + 1;end if;
+            
         end LOOP;               
         op_code <= "00000000100000000000000010000111";
+        wait for 15ns;
         new_ins <= not new_ins;
         x_reg_in <= (OTHERS => '0');
-        do_load <= load_valid;
         write_tkeep <= (others => '1');
         write_tdata <= (others => '0');
         write_tlast <= '1';
@@ -190,12 +198,15 @@ begin
 
         wait on done;
         op_code <= "00000000100000000000000100000111";
+        wait for 150 ns;
         new_ins <= not new_ins;
         wait on done;
         op_code <= "10110100000100010010000001010111";
+        wait for 15ns;
         new_ins <= not new_ins;
         wait on done;
         op_code <= "00000000100000000000000000100111";
+        wait for 15ns;
         new_ins <= not new_ins;
         read_tready <= '1';
         wait on done;
