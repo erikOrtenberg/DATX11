@@ -47,6 +47,7 @@ architecture v2 of control_unit_lane is
 SIGNAL advance : STD_LOGIC;
 SIGNAL REGW_1  : STD_LOGIC;
 signal REGR_1  : STD_LOGIC;
+SIGNAL REGR_IDX_I : STD_LOGIC;
 SIGNAL state   : lane_state_type;
 SIGNAL prev_state  : lane_state_type;
 
@@ -142,6 +143,7 @@ begin
     done_cnt <= STD_LOGIC_VECTOR(done_cn);
     new_instr <= ni;
     done <= done_i;
+    regw_idx <= regr_idx;
     advance_u : process(op_cat, load_valid, store_ready,new_instr,done_i,num_ex,vlen)
     begin
         case state is
@@ -240,9 +242,9 @@ begin
                 state   <= INSTR;
                 num_ex  <= "00001";
             end if;
-            if(advance = '1') then
-                REGW_IDX <= REGR_IDX;
-            end if;
+            -- if(advance = '1') then
+            --     REGW_IDX <= REGR_IDX;
+            -- end if;
         end if;
     end process;
 
@@ -428,13 +430,13 @@ begin
             end case;
 
             case state is
-              when EX1 =>
-                REGR_IDX <= "01";
               when EX2 =>
-                REGR_IDX <= "10";
+                REGR_IDX <= "01";
               WHEN EX3 =>
+                REGR_IDX <= "10";
+              WHEN EX4 =>
                 REGR_IDX <= "11";
-              WHEN OTHERS =>
+              when OTHERS =>
                 REGR_IDX <= "00";
             end case;
         end if;

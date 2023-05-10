@@ -153,6 +153,7 @@ begin
         Variable space : character;
         variable count : integer := 0;
         variable security : integer := 0;
+        variable done_helper : std_logic;
     begin
         write_tvalid <= '0';
         resetn <= '1';
@@ -170,43 +171,69 @@ begin
         new_ins <= not new_ins;
         wait on done;
         
+        wait for 40 ns;
 
 
-        while count < 10 and security < 10 loop          
+        while count < 2 and security < 10 loop          
             wait until rising_edge(clk);
                         if(write_tready = '1') then
 
-            write_tvalid <= '0';
-            wait for 20 ns;
             write_tlast <= '0';
             write_tkeep <= (others => '1');
             write_tdata <= (others => '0');
-            write_tdata(7 downto 0) <= std_logic_vector(to_unsigned(count+7, 8));
+            write_tdata <= std_logic_vector(to_unsigned(count+23,64));
             write_tvalid <= '1';
             count := count + 1;else security := security + 1;end if;
-            
-        end LOOP;               
-        op_code <= "00000000100000000000000010000111";
-        wait for 15ns;
-        new_ins <= not new_ins;
-        x_reg_in <= (OTHERS => '0');
-        write_tkeep <= (others => '1');
-        write_tdata <= (others => '0');
-        write_tlast <= '1';
-        write_tvalid <= '1';
+        end LOOP;
+
         count := 0;
 
-        wait on done;
+        while count < 6 and security < 10 loop          
+            wait until rising_edge(clk);
+                        if(write_tready = '1') then
+
+            write_tlast <= '0';
+            write_tkeep <= (others => '1');
+            write_tdata <= (others => '0');
+            write_tdata <= std_logic_vector(to_unsigned(count+15,64));
+            write_tvalid <= '1';
+            count := count + 1;else security := security + 1;end if;
+        end LOOP;
+
+        wait until rising_edge(clk);
+        write_tvalid <= '0';
+
+
+        -- wait for 50 ns;
+        -- while count < 8 and security < 10 loop          
+        --     wait until rising_edge(clk);
+        --                 if(write_tready = '1') then
+
+        --     write_tlast <= '0';
+        --     write_tkeep <= (others => '1');
+        --     write_tdata <= (others => '0');
+        --     write_tdata(7 downto 0) <= std_logic_vector(to_unsigned(count+7, 8));
+        --     write_tdata(58 DOWNTO 56) <= "101";
+        --     write_tvalid <= '1';
+        --     count := count + 1;else security := security + 1;end if;
+        --     
+        -- end LOOP;               
+
+        wait until rising_edge(clk);
+        write_tvalid <= '0';
+        -- op_code <= "00000000100000000000000010000111";
+        -- wait for 15ns;
+        -- new_ins <= not new_ins;
+        -- x_reg_in <= (OTHERS => '0');
+
         op_code <= "00000000100000000000000100000111";
-        wait for 150 ns;
         new_ins <= not new_ins;
         wait on done;
+
         op_code <= "10110100000100010010000001010111";
-        wait for 15ns;
         new_ins <= not new_ins;
         wait on done;
         op_code <= "00000000100000000000000000100111";
-        wait for 15ns;
         new_ins <= not new_ins;
         read_tready <= '1';
         wait on done;
