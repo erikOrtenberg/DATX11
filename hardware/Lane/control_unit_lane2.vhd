@@ -176,20 +176,13 @@ begin
         if(resetn = '0') then 
             state   <= INSTR;
             num_ex  <= "00001";
-            mem_time_out <= 0;
             done_cn <= (OTHERS=>'0');
             done_i  <= '0';
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
-            if(advance = '0') then
-              mem_time_out <= mem_time_out + 1;
-            else
-              mem_time_out <= 0;
-              time_out_i <= '0';
-            end if;
 
             prev_state <= state;
             prev_offset <= mem_offset_i;
-            if advance = '1' and mem_time_out < 1000000 then
+            if advance = '1' then
                 case op_cat is
                   when OPMVV | OPMVX | VL_unit_stride | VS_unit_stride => -- Instructions that take multiple execute stages
                     if(unsigned(VLEN and num_ex) /= 0) THEN
@@ -237,10 +230,6 @@ begin
                     num_ex <= "00001";
                   end if;
                 end case;
-            elsif mem_time_out >= 1000000 then 
-                time_out_i <= '1';
-                state   <= INSTR;
-                num_ex  <= "00001";
             end if;
             -- if(advance = '1') then
             --     REGW_IDX <= REGR_IDX;
