@@ -237,7 +237,22 @@ begin
         new_ins <= not new_ins;
         read_tready <= '1';
         wait on done;
+        read_tready <= '0';
 
+        report "Trying to decrease the vector length";
+        op_code <= "11000000000001000111000001010111";
+        new_ins <= not new_ins;
+        wait on done;
+        op_code <= "00000000100000000000000010100111";
+        report "Trying to assign new instr";
+        new_ins <= not new_ins;
+        wait for 135 ns;
+        read_tready <= '1';
+        wait for 45 ns;
+        read_tready <= '0';
+        wait for 25 ns;
+        read_tready <= '1';
+        wait on done;
 
 
 
