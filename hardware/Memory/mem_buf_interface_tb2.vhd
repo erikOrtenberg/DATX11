@@ -188,7 +188,7 @@ begin
 
         count := 0;
 
-        while count < 6 and security < 10 loop          
+        while count < 10 and security < 10 loop          
             wait until rising_edge(clk);
                         if(write_tready = '1') then
 
@@ -227,6 +227,10 @@ begin
         -- x_reg_in <= (OTHERS => '0');
 
         op_code <= "00000000100000000000000100000111";
+        new_ins <= not new_ins;
+        wait on done;
+
+        op_code <= "00000000100000000000000000000111";
         new_ins <= not new_ins;
         wait on done;
 
