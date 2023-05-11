@@ -41,14 +41,12 @@ begin
     outC <= registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(readRegSel)));
     regFile: process(clk, resetn)
     begin
-        if(resetn = '0') then
-            registers <= (others => (others => (others => '0')));
-        else
-            if(rising_edge(clk)) then
-                if(writeEnable = '1') then
-                    registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= dataIn;
-                end if;
+
+        if(rising_edge(clk)) then
+            if(writeEnable = '1') then
+                registers(to_integer(unsigned(regCSel)))(to_integer(unsigned(writeRegSel))) <= dataIn;
             end if;
         end if;
+        
     end process;
 end v1;

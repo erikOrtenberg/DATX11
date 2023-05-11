@@ -31,7 +31,7 @@ ENTITY control_unit_lane IS
         ALU_OP                  : OUT STD_LOGIC_VECTOR(ALU_OP_LENGTH - 1 downto 0);
         VLENB_U                 : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         VLEN_U                  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-        WRITE_VL                 : OUT STD_LOGIC;
+        WRITE_VL                : OUT STD_LOGIC;
         mem_offset              : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
         wb_select               : OUT STD_LOGIC;
         DONE                    : OUT STD_LOGIC;
@@ -87,6 +87,8 @@ signal new_instr    : STD_LOGIC;
 --signal wb_select               :  STD_LOGIC;
 --signal DONE                    :  STD_LOGIC
 
+signal count_i : integer := 0; 
+signal count_reset : std_logic;
 signal OP                        : STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
 
 signal mem_time_out : integer := 0;
@@ -142,6 +144,7 @@ begin
     REGR <= REGR_1;
     done_cnt <= STD_LOGIC_VECTOR(done_cn);
     new_instr <= ni;
+    --done <= done_i when count_i >= 100000 else done;
     done <= done_i;
     regw_idx <= regr_idx;
     advance_u : process(op_cat, load_valid, store_ready,new_instr,done_i,num_ex,vlen)
@@ -149,8 +152,10 @@ begin
         case state is
           WHEN INSTR => 
             if new_instr = done_i then
+              count_reset <= '0';
               advance <= '1';
             else
+              count_reset <= '1';
               advance <= '0';
             end if;
           when OTHERS =>
@@ -178,8 +183,9 @@ begin
             num_ex  <= "00001";
             done_cn <= (OTHERS=>'0');
             done_i  <= '0';
+            count_i <= 0;
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
-
+            if(count_reset = '1') then count_i <= 0; end if;
             prev_state <= state;
             prev_offset <= mem_offset_i;
             if advance = '1' then
@@ -188,6 +194,7 @@ begin
                     if(unsigned(VLEN and num_ex) /= 0) THEN
                       CASE state IS
                         when INSTR  =>
+                            count_i <= count_i + 1;
                             state <= EX1;
                             num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                             mem_offset_i <= "00";
@@ -218,6 +225,7 @@ begin
                     end if;
                 when OTHERS =>
                   if(state = INSTR) THEN
+                    count_i <= count_i + 1;
                     --report "Trying to exit instr phase with single cycli op code" Severity note;
                     state <= EX1;
                     done_cn <= done_cn + 1;

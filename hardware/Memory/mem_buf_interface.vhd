@@ -74,8 +74,8 @@ architecture v1 of mem_buf_interface is
 
 begin
     data_32 <= 
-        data_64(63 downto 32) when which_half = '1' else
-        data_64(31 downto 0);
+        data_64(31 downto 0) when which_half = '1' else
+        data_64(63 downto 32);
     store_keep_32 <= "1111" when store_valid_64 = '1' else (others => '0');
     
     change_half: process(clk, resetn)
@@ -92,7 +92,7 @@ begin
                     if(which_half = '0') then
                         which_half <= '1';
                     else
-                        store_last_32 <= store_last_64;
+                        store_last_32 <= store_last_64;                        
                         which_half <='0';
                         store_ready_64 <= '1';
                     end if;

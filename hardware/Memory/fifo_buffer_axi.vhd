@@ -67,12 +67,12 @@ begin
         elsif (rising_edge(clk)) then
             if(read_tready = '1' and read_tvalid_i = '1')  then
                 read_pointer <= read_pointer + 1; end if;
-            
                 -- conditions to write
             if(write_tvalid = '1' and write_tready_i = '1') then  
                 buf(to_integer(write_pointer(buffer_address - 2 downto 0))) <= i_write;
                 write_pointer <= write_pointer + 1;
             end if;
+            
             if (write_tready_i = '1' and write_tvalid = '1' and read_tready = '1' and read_tvalid_i = '1') then
                 read_while_write <= '1';
                 else read_while_write <= '0'; end if;
