@@ -199,7 +199,7 @@ begin
                             num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                             mem_offset_i <= "00";
                             done_cn <= done_cn + 1;
-                            done_i <= not done_i;
+                            --done_i <= not done_i;
                             op <= op_in;
                             --report "Trying to exit instr phase with multi cycli op code" Severity note;
                         when EX1    =>
@@ -216,11 +216,13 @@ begin
                             mem_offset_i <= "11";
                         when OTHERS => 
                             state <= INSTR;
+                            done_i <= not done_i;
                             num_ex <= "00001";
                             mem_offset_i <= "00";
                       end CASE;
                     else
                       state <= INSTR;
+                      done_i <= not done_i;
                       num_ex <= "00001";
                     end if;
                 when OTHERS =>
@@ -235,6 +237,7 @@ begin
                   else
                     --report "Trying to return to instr phase with single cycle instruction " Severity note;
                     state <= INSTR;
+                    done_i <= not done_i;
                     num_ex <= "00001";
                   end if;
                 end case;
