@@ -38,11 +38,12 @@ signal MAC_OPC : std_logic_vector(63 downto 0);
 
 signal INTERNAL_X : std_logic_vector(63 downto 0);
 signal INTERNAL_A : std_logic_vector(63 downto 0);
+signal SMALL_X    : std_logic_vector(7 downto 0);
 
 begin
     
-    INTERNAL_X(31 downto 0) <= X;
-    INTERNAL_X(63 downto 32) <= (others => '0');
+    SMALL_X <= X(7 downto 0);
+    INTERNAL_X <= SMALL_X & SMALL_X & SMALL_X & SMALL_X & SMALL_X & SMALL_X & SMALL_X & SMALL_X;
     -- Mac component can perform multiplication by zeroing op C
     with OP(0) select 
         MAC_OPC <= C WHEN '0', (OTHERS => '0') WHEN others;
