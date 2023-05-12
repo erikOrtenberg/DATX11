@@ -1,0 +1,7 @@
+ld 0 4
+ld 1 4
+maccvv 0 1 1
+st 1 8
+ld 2 8
+maccvv 1 2 0
+st 0 12
