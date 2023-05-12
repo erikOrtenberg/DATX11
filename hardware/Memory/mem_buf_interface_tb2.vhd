@@ -58,6 +58,7 @@ architecture v2 of mem_buf_interface_tb is
     signal read_tdata                  : std_logic_vector(31 downto 0);
     signal write_tdata                  : std_logic_vector(63 downto 0);
     signal clk, resetn: STD_LOGIC := '0';
+    file vectorFile : text open read_mode is "/home/fredrik/src/DATX11/vectorfile.txt";
 
 
     -- these are towards the vpu
@@ -85,6 +86,8 @@ architecture v2 of mem_buf_interface_tb is
 
     signal data_i : std_logic_vector(3 downto 0); 
     signal new_ins            : std_logic;
+
+    signal a_sig              : std_logic_vector(255 DOWNTO 0);
 begin
 
     buf_interface : component mem_buf_interface
@@ -154,7 +157,21 @@ begin
         variable count : integer := 0;
         variable security : integer := 0;
         variable done_helper : std_logic;
+
+        VARIABLE a_v, b_v, c_v:  std_logic_vector(255 DOWNTO 0);
     begin
+      
+        for i in 1 to 4 LOOP
+          readline(vectorFile,vectorLine);
+          read(vectorline,a_v(64*i-1 DOWNTO 64*(i-1)));
+          read(vectorline,space);
+          read(vectorline,b_v(64*i-1 DOWNTO 64*(i-1)));
+          read(vectorline,space);
+          read(vectorline,c_v(64*i-1 DOWNTO 64*(i-1)));
+        end LOOP;
+
+        a_sig <= a_v;
+
         write_tvalid <= '0';
         resetn <= '1';
         wait for 10ns;
@@ -165,6 +182,7 @@ begin
         read_tready <= '0';
         resetn<= '1';
 
+
         new_ins <= '1';
         op_code <= "00000000100000000000000010000111";
         wait for 15ns;
@@ -174,31 +192,30 @@ begin
         wait for 40 ns;
 
 
-        while count < 2 and security < 10 loop          
+        for i in 1 to 4 LOOP
             wait until rising_edge(clk);
                         if(write_tready = '1') then
 
             write_tlast <= '0';
             write_tkeep <= (others => '1');
             write_tdata <= (others => '0');
-            write_tdata <= std_logic_vector(to_unsigned(count+23,64));
+            write_tdata <= a_v(64*i-1 DOWNTO 64*(i-1));
             write_tvalid <= '1';
             count := count + 1;else security := security + 1;end if;
         end LOOP;
 
-        count := 0;
-
-        while count < 10 and security < 10 loop          
+        for i in 1 to 4 LOOP
             wait until rising_edge(clk);
                         if(write_tready = '1') then
 
             write_tlast <= '0';
             write_tkeep <= (others => '1');
             write_tdata <= (others => '0');
-            write_tdata <= std_logic_vector(to_unsigned(count+15,64));
+            write_tdata <= b_v(64*i-1 DOWNTO 64*(i-1));
             write_tvalid <= '1';
             count := count + 1;else security := security + 1;end if;
         end LOOP;
+
 
         wait until rising_edge(clk);
         write_tvalid <= '0';
@@ -230,6 +247,18 @@ begin
         new_ins <= not new_ins;
         wait on done;
 
+        for i in 1 to 4 LOOP
+            wait until rising_edge(clk);
+                        if(write_tready = '1') then
+
+            write_tlast <= '0';
+            write_tkeep <= (others => '1');
+            write_tdata <= (others => '0');
+            write_tdata <= c_v(64*i-1 DOWNTO 64*(i-1));
+            write_tvalid <= '1';
+            count := count + 1;else security := security + 1;end if;
+        end LOOP;
+
         op_code <= "00000000100000000000000000000111";
         new_ins <= not new_ins;
         wait on done;
@@ -243,10 +272,10 @@ begin
         wait on done;
         read_tready <= '0';
 
-        report "Trying to decrease the vector length";
-        op_code <= "11000000000001000111000001010111";
-        new_ins <= not new_ins;
-        wait on done;
+        -- report "Trying to decrease the vector length";
+        -- op_code <= "11000000000001000111000001010111";
+        -- new_ins <= not new_ins;
+        -- wait on done;
         op_code <= "00000000100000000000000010100111";
         report "Trying to assign new instr";
         new_ins <= not new_ins;
@@ -269,9 +298,19 @@ begin
         read_tready <= '0';
         wait for 25 ns;
         read_tready <= '1';
+
+
+        report "Trying to execute a new instruction";
+        new_ins <= done;
         wait on done;
 
+        report "Trying to execute a new instruction";
+        new_ins <= done; 
+        wait on done;
 
+        report "Trying to execute a new instruction";
+        new_ins <= done;
+        wait on done;
 
         ASSERT FALSE
             REPORT "Simulation complete"
