@@ -77,27 +77,36 @@ begin
         data_64(31 downto 0) when which_half = '1' else
         data_64(63 downto 32);
     store_keep_32 <= "1111" when store_valid_64 = '1' else (others => '0');
-    
+    store_valid_32 <= store_valid_64;
+    store_last_32 <= store_last_64 and which_half;
+    store_ready_64 <= store_ready_32 and which_half;
+
     change_half: process(clk, resetn)
     begin
         if(resetn = '0') then
             which_half <= '0';
         elsif(rising_edge(clk))then 
-            store_ready_64 <= '0';
-            store_last_32 <= '0'; 
-            store_valid_32 <= '0';
+            -- store_ready_64 <= '0';
+            -- store_last_32 <= '0'; 
+            -- store_valid_32 <= '0';
             if(store_valid_64 = '1') then
-                store_valid_32 <= '1';
+            --     store_valid_32 <= '1';
+                 --store_keep_32 <= "1111";
                 if(store_ready_32 = '1') then
                     if(which_half = '0') then
                         which_half <= '1';
+                        --data_32 <= data_64(63 DOWNTO 32);
+                        -- store_last_32 <= store_last_64;                        
                     else
-                        store_last_32 <= store_last_64;                        
+                        --data_32 <= data_64(31 DOWNTO 0);
                         which_half <='0';
-                        store_ready_64 <= '1';
+                        -- store_ready_64 <= '1';
                     end if;
                 end if;
-            else which_half <= '0'; end if;
+            else 
+              which_half <= '0';
+              -- store_keep_32 <= (OTHERS => '0');
+            end if;
         end if; 
     end process;
     load_buffer : entity work.fifo_buffer_axi(v1)
