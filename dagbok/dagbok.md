@@ -57,7 +57,7 @@ Denna vecka har vi hållt veckomöte och handledarmöte. Erik har bråkat med Vi
 Vi jobbade på rapporten. Skrev mycket :) Vi fick äntligen VPUn att syntentisera! Vi jobbar vidare på VPU optimeringar. 
 
 ## LV 5
-
+Ännu en vecka har vi hållt veckomöte och handledarmöte. Vi kopplade ihop minnesinterfacet med lanen, skrev om kontrollenheten och färdigställde rapporten för inlämning av första utkastet.
 
 ## LV 6
 
