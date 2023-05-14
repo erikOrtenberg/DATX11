@@ -8,7 +8,7 @@ entity dummy_mem is
     generic(
         data_w : integer := 64;   --data width 
         addr_w : integer := 32;   --addr width
-        mem_init_file : string := "/home/kryddan/repos/DATX11/hardware/Memory/memory.mif"
+        mem_init_file : string := "/home/fredrik/src/DATX11/b_zero.mif"
         );
     port (
         clk             : in std_logic;
@@ -25,7 +25,7 @@ end dummy_mem;
 
 architecture v1 of dummy_mem is 
     -- not full memory width!! should be 2 ** addr_w
-    type mem_array is array (0 to (addr_w)-1) 
+    type mem_array is array (0 to 65535) 
         of std_logic_vector(data_w-1 downto 0);
 
     -- SIMULATION ONLY STUFF
@@ -33,13 +33,16 @@ architecture v1 of dummy_mem is
     impure function init_memory_wfile(mif_file_name : in string) return mem_array is
         file mif_file       : text open read_mode is mif_file_name;
         variable mif_line   : line;
+        variable i          : integer := 0;
         variable temp_bv    : bit_vector(data_w-1 downto 0);
         variable temp_mem   : mem_array;
         begin
-            for i in mem_array'range loop
+            --for i in mem_array'range loop
+          while not endfile(mif_file) loop
                 readline(mif_file, mif_line);
                 read(mif_line, temp_bv);
                 temp_mem(i) := to_stdlogicvector(temp_bv);
+                i := i+1;
             end loop;
             return temp_mem;
     end function;

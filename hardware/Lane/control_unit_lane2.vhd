@@ -231,7 +231,7 @@ begin
                     --report "Trying to exit instr phase with single cycli op code" Severity note;
                     state <= EX1;
                     done_cn <= done_cn + 1;
-                    done_i <= not done_i;
+                    -- done_i <= not done_i;
                     num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     op <= op_in;
                   else

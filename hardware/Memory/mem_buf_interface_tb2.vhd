@@ -159,6 +159,9 @@ begin
         variable done_helper : std_logic;
 
         VARIABLE a_v, b_v, c_v:  std_logic_vector(255 DOWNTO 0);
+
+        VARIABLE B_ADDR : UNSIGNED(63 DOWNTO 0) := to_unsigned(0,64);
+        VARIABLE C_ADDR : UNSIGNED(63 DOWNTO 0) := to_unsigned(0,64);
     begin
       
         for i in 1 to 4 LOOP
@@ -186,7 +189,7 @@ begin
         new_ins <= '1';
         op_code <= "00000000100000000000000010000111";
         wait for 15ns;
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait on done;
         
         wait for 40 ns;
@@ -240,11 +243,11 @@ begin
         write_tvalid <= '0';
         -- op_code <= "00000000100000000000000010000111";
         -- wait for 15ns;
-        -- new_ins <= not new_ins;
+        -- new_ins <= done;
         -- x_reg_in <= (OTHERS => '0');
 
         op_code <= "00000000100000000000000100000111";
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait on done;
 
         for i in 1 to 4 LOOP
@@ -260,25 +263,25 @@ begin
         end LOOP;
 
         op_code <= "00000000100000000000000000000111";
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait on done;
 
         op_code <= "10110100000100010010000001010111";
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait on done;
         op_code <= "00000000100000000000000000100111";
-        new_ins <= not new_ins;
+        new_ins <= done;
         read_tready <= '1';
         wait on done;
         read_tready <= '0';
 
         -- report "Trying to decrease the vector length";
         -- op_code <= "11000000000001000111000001010111";
-        -- new_ins <= not new_ins;
+        -- new_ins <= done;
         -- wait on done;
         op_code <= "00000000100000000000000010100111";
         report "Trying to assign new instr";
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait for 135 ns;
         read_tready <= '1';
         wait for 45 ns;
@@ -287,11 +290,11 @@ begin
         read_tready <= '1';
 
         op_code <= "11000000000011111111000001010111";
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait on done;
 
         op_code <= "00000000100000000000000100100111";
-        new_ins <= not new_ins;
+        new_ins <= done;
         wait for 135 ns;
         read_tready <= '1';
         wait for 45 ns;
