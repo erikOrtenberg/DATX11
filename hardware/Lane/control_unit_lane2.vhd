@@ -87,7 +87,7 @@ signal new_instr    : STD_LOGIC;
 --signal wb_select               :  STD_LOGIC;
 --signal DONE                    :  STD_LOGIC
 
-signal count_i : integer := 0; 
+signal count_i : integer; 
 signal count_reset : std_logic;
 signal OP                        : STD_LOGIC_VECTOR(OP_LENGTH-1 DOWNTO 0);
 
@@ -144,8 +144,8 @@ begin
     REGR <= REGR_1;
     done_cnt <= STD_LOGIC_VECTOR(done_cn);
     new_instr <= ni;
-    done <= done_i when count_i >= 10000 else done;
-    --done <= done_i;
+    --done <= done_i when count_i >= 10000 else done;
+    done <= done_i;
     regw_idx <= regr_idx;
     advance_u : process(op_cat, load_valid, store_ready,new_instr,done_i,num_ex,vlen)
     begin
@@ -155,8 +155,10 @@ begin
               count_reset <= '0';
               advance <= '1';
             else
-              count_reset <= '1';
-              advance <= '0';
+              if (count_i >= 10000) then
+                  count_reset <= '1';
+                  advance <= '0';
+              end if;
             end if;
           when OTHERS =>
             if (op_cat = Vl_unit_stride) then 
@@ -201,7 +203,7 @@ begin
                             done_cn <= done_cn + 1;
                             --done_i <= not done_i;
                             op <= op_in;
-                            --report "Trying to exit instr phase with multi cycli op code" Severity note;
+                            report "Trying to exit instr phase with multi cycli op code" Severity note;
                         when EX1    =>
                             state <= EX2;
                             num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
@@ -228,10 +230,10 @@ begin
                 when OTHERS =>
                   if(state = INSTR) THEN
                     count_i <= count_i + 1;
-                    --report "Trying to exit instr phase with single cycli op code" Severity note;
+                    report "Trying to exit instr phase with single cycli op code" Severity note;
                     state <= EX1;
                     done_cn <= done_cn + 1;
-                    -- done_i <= not done_i;
+                    done_i <= not done_i;
                     num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     op <= op_in;
                   else
