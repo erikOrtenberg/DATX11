@@ -49,7 +49,7 @@ architecture Behavioral of macc64 is
       G2: for i in 1 to 8 generate
       begin
         inter(16*i-1 downto 16*(i-1)) <= signed(a(8*i-1 downto 8*(i-1)))*signed(b(8*i-1 downto 8*(i-1)));
-        other(8*i-1 downto 8*(i-1)) <= inter(16*i-8-1 downto 16*(i-1)) + signed(c(8*i-1 downto 8*(i-1)));
+        other(8*i-1 downto 8*(i-1)) <= inter(16*(i)-1 downto 16*i-8 ) + signed(c(8*i-1 downto 8*(i-1)));
         r <= std_logic_vector(other);
       END GENERATE G2; 
  end Behavioral;

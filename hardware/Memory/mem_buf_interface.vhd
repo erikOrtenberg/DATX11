@@ -38,9 +38,9 @@ entity mem_buf_interface is
 
         --these are towards the memory
         --store
-        read_tkeep          : out std_logic_vector(3 downto 0); --how much to keep
+        read_tkeep          : out std_logic_vector(7 downto 0); --how much to keep
         read_tlast          : out std_logic;   --is this the last in a vector    
-        read_tdata          : out std_logic_vector(31 downto 0);
+        read_tdata          : out std_logic_vector(63 downto 0);
         read_tvalid         : out std_logic;    -- we are not empty (we want to write)
         read_tready         : in std_logic;     -- next is not full (we can write)
 
@@ -73,42 +73,42 @@ architecture v1 of mem_buf_interface is
 
 
 begin
-    data_32 <= 
-        data_64(31 downto 0) when which_half = '1' else
-        data_64(63 downto 32);
-    store_keep_32 <= "1111" when store_valid_64 = '1' else (others => '0');
-    store_valid_32 <= store_valid_64;
-    store_last_32 <= store_last_64 and which_half;
-    store_ready_64 <= store_ready_32 and which_half;
+    --data_32 <= 
+    --    data_64(31 downto 0) when which_half = '1' else
+    --    data_64(63 downto 32);
+    --store_keep_32 <= "1111" when store_valid_64 = '1' else (others => '0');
+    --store_valid_32 <= store_valid_64;
+    --store_last_32 <= store_last_64 and which_half;
+    --store_ready_64 <= store_ready_32 and which_half;
 
-    change_half: process(clk, resetn)
-    begin
-        if(resetn = '0') then
-            which_half <= '0';
-        elsif(rising_edge(clk))then 
+    --change_half: process(clk, resetn)
+    --begin
+    --    if(resetn = '0') then
+    --        which_half <= '0';
+    --    elsif(rising_edge(clk))then 
             -- store_ready_64 <= '0';
             -- store_last_32 <= '0'; 
             -- store_valid_32 <= '0';
-            if(store_valid_64 = '1') then
+    --        if(store_valid_64 = '1') then
             --     store_valid_32 <= '1';
                  --store_keep_32 <= "1111";
-                if(store_ready_32 = '1') then
-                    if(which_half = '0') then
-                        which_half <= '1';
+    --            if(store_ready_32 = '1') then
+    --                if(which_half = '0') then
+    --                    which_half <= '1';
                         --data_32 <= data_64(63 DOWNTO 32);
                         -- store_last_32 <= store_last_64;                        
-                    else
+    --                else
                         --data_32 <= data_64(31 DOWNTO 0);
-                        which_half <='0';
+    --                    which_half <='0';
                         -- store_ready_64 <= '1';
-                    end if;
-                end if;
-            else 
-              which_half <= '0';
+    --                end if;
+    --            end if;
+    --        else 
+    --          which_half <= '0';
               -- store_keep_32 <= (OTHERS => '0');
-            end if;
-        end if; 
-    end process;
+    --        end if;
+    --    end if; 
+    --end process;
     load_buffer : entity work.fifo_buffer_axi(v1)
     generic map(
         bus_width       => 64,
@@ -141,11 +141,11 @@ begin
         keep_size       => 8  -- 2log of bus_width
     )
     port map(
-        read_tkeep      => store_keep_64,
-        read_tlast      => store_last_64,
-        read_tdata      => data_64,
-        read_tvalid     => store_valid_64,
-        read_tready     => store_ready_64,
+        read_tkeep      => read_tkeep,
+        read_tlast      => read_tlast,
+        read_tdata      => read_tdata,
+        read_tvalid     => read_tvalid,
+        read_tready     => read_tready,
          
         write_tkeep     => "11111111",
         write_tlast     => store_last,
@@ -156,28 +156,28 @@ begin
         resetn          => resetn    
     );
 
-    store_buffer_32 : entity work.fifo_buffer_axi(v1)
-    generic map(
-        bus_width       => 32,
-        buffer_length   => 16, -- amount of buffers
-        buffer_address  => 5, -- 2log of buffers + 1
-        keep_size       => 4  -- 2log of bus_width
-    )
-    port map(
-        read_tkeep      => read_tkeep,
-        read_tlast      => read_tlast, 
-        read_tdata      => read_tdata,
-        read_tvalid     => read_tvalid,
-        read_tready     => read_tready,
+    --store_buffer_32 : entity work.fifo_buffer_axi(v1)
+    --generic map(
+    --    bus_width       => 32,
+    --    buffer_length   => 16, -- amount of buffers
+    --    buffer_address  => 5, -- 2log of buffers + 1
+    --    keep_size       => 4  -- 2log of bus_width
+    --)
+    --port map(
+    --    read_tkeep      => open,
+    --    read_tlast      => open, 
+    --    read_tdata      => open,
+    --    read_tvalid     => open,
+    --    read_tready     => open,
          
-        write_tkeep     => store_keep_32,
-        write_tlast     => store_last_32,
-        write_tdata     => data_32,
-        write_tvalid    => store_valid_32,
-        write_tready    => store_ready_32,
-        clk             => clk,
-        resetn          => resetn
-    );
+    --    write_tkeep     => store_keep_32,
+    --    write_tlast     => store_last_32,
+    --    write_tdata     => data_32,
+    --    write_tvalid    => store_valid_32,
+    --    write_tready    => store_ready_32,
+    --    clk             => clk,
+    --    resetn          => resetn
+    --);
 
 
 end v1;

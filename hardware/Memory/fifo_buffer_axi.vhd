@@ -63,6 +63,8 @@ begin
     process(clk, resetn)
     begin
         if(resetn = '0') then
+            read_pointer <= (others => '0');
+            write_pointer <= (others => '0');
             buf <= (others => (others => '0'));
         elsif (rising_edge(clk)) then
             if(read_tready = '1' and read_tvalid_i = '1')  then
@@ -72,7 +74,7 @@ begin
                 buf(to_integer(write_pointer(buffer_address - 2 downto 0))) <= i_write;
                 write_pointer <= write_pointer + 1;
             end if;
-            
+
             if (write_tready_i = '1' and write_tvalid = '1' and read_tready = '1' and read_tvalid_i = '1') then
                 read_while_write <= '1';
                 else read_while_write <= '0'; end if;

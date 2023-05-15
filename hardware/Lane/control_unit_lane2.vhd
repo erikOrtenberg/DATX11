@@ -144,8 +144,8 @@ begin
     REGR <= REGR_1;
     done_cnt <= STD_LOGIC_VECTOR(done_cn);
     new_instr <= ni;
-    --done <= done_i when count_i >= 100000 else done;
-    done <= done_i;
+    done <= done_i when count_i >= 10000 else done;
+    --done <= done_i;
     regw_idx <= regr_idx;
     advance_u : process(op_cat, load_valid, store_ready,new_instr,done_i,num_ex,vlen)
     begin
