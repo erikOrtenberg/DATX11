@@ -9,7 +9,6 @@ ENTITY ctrlrg IS
   resetn:       in std_logic;
   write_csr:    in std_logic;
   write_vl:     in std_logic;
-  write_vlb:    in std_logic;
   update:       in crs;
   data:         out crs);
 END ctrlrg;
@@ -20,35 +19,43 @@ ARCHITECTURE v1 OF ctrlrg IS
 begin
 
   data <= state;
+  state.VSTART  <= (OTHERS => (OTHERS => '0'));
+  state.VXRM    <= (OTHERS => (OTHERS => '0'));
+  state.VXSAT.RESERVED   <= (OTHERS => '0');
+  state.VXSAT.sat <= '0';
+  state.vtype.vill <= '0';
+  state.vtype.reserved <= (OTHERS => '0');
+  state.vtype.vma <= '0';
+  state.vtype.vta <= '0';
+  state.vtype.vsew <= (OTHERS => '0');
+  state.vtype.vlmul <= (OTHERS => '0');
+
+
 
   PROCESS(clk,resetn)
   begin
     if(resetn = '0') then
-      state.VSTART  <= (OTHERS => (OTHERS => '0'));
-      state.VXRM    <= (OTHERS => (OTHERS => '0'));
-      state.VXSAT.RESERVED   <= (OTHERS => '0');
-      state.VXSAT.sat <= '0';
+      --report "Resetting control signals" severity note;
+      
       state.VCSR.vxrm    <= (OTHERS => '0');
       state.VCSR.vxsat    <= '0';
-      state.VL.VL <= std_logic_vector(to_unsigned(256,64));
-      state.VLB.VLENB <= std_logic_vector(to_unsigned(32,64));
-    end IF;
+      state.VL.VL <= "01111";
+      state.VL.VLB <= "11111";
 
-    if(rising_edge(clk)) then
+      
+    elsif(rising_edge(clk)) then
       CASE write_csr IS
-        when '0' => state.VCSR <= update.VCSR;
+        when '1' => state.VCSR <= update.VCSR;
         when others => null;
       end case;
 
       CASE write_vl IS
-        when '0' => state.VL <= update.VL;
+        when '1' =>
+          --report "Trying to assign VLB" severity note;
+          state.VL <= update.VL;
         when others => null;
       end case;
 
-      CASE write_vlb IS
-        when '0' => state.VLB <= update.VLB;
-        when others => null;
-      end case;
     end IF;
 
     end PROCESS;

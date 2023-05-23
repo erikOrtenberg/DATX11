@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.ALL;
 use work.common_pkg.all;
 
 entity lane is
@@ -15,8 +16,29 @@ entity lane is
   port(
       clk                 : in std_logic;
       RESETN              : in std_logic;
-      op_code		    : in std_logic_vector(op_length-1 DOWNTO 0);
-      done		    : out std_logic
+      op_code		          : in std_logic_vector(op_length-1 DOWNTO 0);
+      x_reg_in            : in std_logic_vector(nr_of_mem_addr_bits-1   DOWNTO 0);
+      new_ins             : in std_logic;
+
+      done		        : out std_logic;
+        
+      -- data signals
+      store_data          : out std_logic_vector (bus_width-1 downto 0);
+      load_data           : in std_logic_vector (bus_width-1 downto 0);
+      
+      -- needs to be set at the end of each memory operation
+      store_last          : out std_logic;
+      
+      -- these signals tell the memory to load/store
+      store_enable        : out std_logic;
+      load_enable         : out std_logic;
+      
+      -- these 2 signals are how the mem interface tells the vpu to continue/stop
+      store_ready         : in std_logic;
+      load_valid          : in std_logic;
+      done_cnt            : out std_logic_vector(2 DOWNTO 0);
+      time_out            : out std_logic   -- for when no data is found for load operations
+
   --todo add ports
   );
 end lane;
@@ -45,6 +67,11 @@ architecture v1 of lane is
   signal regWrite                 : std_logic;
   signal awaitingNewInstr         : std_logic;
 
+  signal mem_ready                : std_logic;
+  signal x_reg_buf                : std_logic_vector(nr_of_mem_addr_bits-1 DOWNTO 0);
+  signal mem_offset               : std_logic_vector(1 DOWNTO 0);
+  signal wb_select                : std_logic;
+
   -- Memory signals
 
   signal mem_data_in,mem_data_out : std_logic_vector(bus_width - 1 downto 0);
@@ -52,10 +79,17 @@ architecture v1 of lane is
   signal mem_addr                 : std_logic_vector(nr_of_mem_addr_bits - 1 downto 0);
 
   -- Control regisiternś
-  signal csigs:    crs;
+  signal csigs:     crs;
+  signal csigs_u:   crs;
   signal write_csr: std_logic;
   signal write_vl:  std_logic;
-  signal write_vlb: std_logic;
+  
+  signal mem_last : std_logic;
+
+  signal C_i : std_logic_vector(bus_width - 1 downto 0);
+  signal done_cn  : std_logic_vector(2 DOWNTO 0);
+  signal ni  : std_logic;
+  signal store_lasti    : std_logic;
 
   -- Scalar register signals
 
@@ -64,11 +98,21 @@ architecture v1 of lane is
   --signal x_writeRegSel            : std_logic_vector(4 downto 0);
 begin
 
-  WITH mem_read SELECT wb_register <=
-    R WHEN '0',
-    mem_data_out when OTHERS;
+--  wb: process(clk)
+--  begin
+--      if(falling_edge(clk) and wb_writeEnable = '1') then
+--          case mem_read is
+--              when '1'    => wb_register <= mem_data_out;
+--              when others => wb_register <= R;
+--          end case;
+--      end if;
+--  end process;
 
-  ctrl : entity work.control_unit_lane(v1)
+   with wb_select SELECT wb_register <=
+       R when '0',
+       mem_data_out when OTHERS;
+
+  ctrl : entity work.control_unit_lane(v2)
       generic map (
           NR_OF_ADDR_BITS => nr_of_reg_addr_bits,
           OP_LENGTH       => op_length,
@@ -77,8 +121,9 @@ begin
       port map(
           clk             => clk, 
           resetn          => resetn,
-          OP              => op_code,
-          VLENB           => csigs.VLB.VLENB(3 DOWNTO 0),
+          OP_in              => op_code,
+          VLENB           => csigs.VL.VLB,
+          VLEN            => csigs.VL.VL, 
           REG_A           => regASel,
           REG_B           => regBSel,
           REG_C           => regCSel,
@@ -96,20 +141,51 @@ begin
           REGR            => regRead,
           REGW            => regWrite,
           ALU_OP          => ALU_OP,
+          VLEN_U          => csigs_u.vl.vl,
+          VLENB_U         => csigs_u.vl.vlb,
+          write_vl        => write_vl,
+          load_valid      => load_valid,
+          store_ready     => store_ready,
+          store_last      => store_lasti,
+          mem_offset    => mem_offset,
+          wb_select       => wb_select,
+          done_cnt         => done_cn,
+          ni              => ni,
+          time_out => time_out,
+
           DONE            => awaitingNewInstr
       );
 
-  -- mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
-  mem : entity work.dummy_mem(v1)
-      port map(
-          clk         => clk,
-          m_read      => mem_read,
-          m_write     => mem_write,
-          m_addr      => mem_addr,
-          data_in     => mem_data_in,
-          data_out    => mem_data_out
-      );
-
+  -- mem_ahttps://raw.githubusercontent.com/erikOrtenberg/DATX11/ft_sim_mem/hardware/Memory/dummy_memory.vhdddr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
+        
+    -- data signals
+    store_data  <=  C;
+    mem_data_out <= load_data;
+         
+    -- needs to be set at the end of each memory operation
+    store_last <= store_lasti;
+         
+    -- these signals tell the memory to load/store
+    store_enable        <= mem_write;
+    load_enable         <= mem_read;
+         
+    -- left as or for now
+    mem_ready <= store_ready or load_valid;
+    done_cnt <= done_cn;
+    ni        <= new_ins;
+ 
+ 
+    --mem_addr <= scalar_input(nr_of_mem_addr_bits - 1 downto 0);
+    -- mem : entity work.memory_interface(v1)
+    --     port map(
+    --         clk             => clk,
+    --         address         => x_reg_in,
+    --         data_write      => C,
+    --         data_read       => mem_data_out,
+    --         output_enable   => mem_read,
+    --         write_enable    => mem_write,
+    --         mem_ready       => mem_ready
+    --       );
   -- Shouldn't be in the VPU
   --xreg : entity work.x_register_file(v1)
    --   port map(
@@ -162,8 +238,7 @@ begin
       resetn => resetn,
       write_csr => write_csr,
       write_vl => write_vl,
-      write_vlb => write_vlb,
-      update => csigs,
+      update => csigs_u,
       data => csigs
             );
 
@@ -173,7 +248,11 @@ begin
           B=>B, 
           C=>C, 
           R=>R, 
+          X => x_reg_in,
+          use_v => v_use_a,
           op=>ALU_OP
       );
+
+    x_reg_buf <= x_reg_in(31 DOWNTO 2) & mem_offset;
 
 end v1;

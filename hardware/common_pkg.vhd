@@ -4,9 +4,9 @@ use ieee.numeric_std.all;
 
 package Common_pkg is    -- untested...
 
-    type lane_state_type is (INSTR, EX1, EX2, EX3, EX4, EX5);
+    type lane_state_type is (INSTR, EX1, EX2, EX3, EX4);
 
-    type OP_CODE is (LD_FP, ST_FP, OP_VEC);
+    type OP_CODE is (LD_FP, ST_FP, OP_VEC, NOP);
 
     type LOAD_STORE_FP is record
         nf          : std_logic_vector(2 downto 0);
@@ -28,6 +28,25 @@ package Common_pkg is    -- untested...
         field1      : std_logic_vector(4 downto 0);
     end record OP_V;
 
+    type VSETVLI IS RECORD
+        ZIMM        : STD_LOGIC_VECTOR(10 DOWNTO 0);
+        RS1         : STD_LOGIC_VECTOR(4  DOWNTO 0);
+        RD          : STD_LOGIC_VECTOR(4  DOWNTO 0);
+    end RECORD VSETVLI;
+
+    type VSETIVLI IS RECORD
+        ZIMM        : STD_LOGIC_VECTOR(9 DOWNTO 0);
+        UIMM        : STD_LOGIC_VECTOR(4 DOWNTO 0);
+        RD          : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    end RECORD VSETIVLI;
+
+    type VSETVL IS RECORD
+        RS2         : STD_LOGIC_VECTOR(4 DOWNTO 0);
+        RS1         : STD_LOGIC_VECTOR(4 DOWNTO 0);
+        RD          : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    end RECORD VSETVL;
+
+
     type VTYPE is RECORD
       vill:   std_logic;
       reserved: std_logic_vector(54 DOWNTO 0);
@@ -38,12 +57,9 @@ package Common_pkg is    -- untested...
     end record VTYPE;
     
     type vl is RECORD
-      vl:   std_logic_vector(63 DOWNTO 0);
+      vl:   std_logic_vector(4 DOWNTO 0);
+      VLB:  std_logic_vector(4 DOWNTO 0);
     end record vl;
-    
-    type vlenb is RECORD
-      vlenb:  std_logic_vector(63 DOWNTO 0);
-    end record vlenb;
     
     type vstart is RECORD
       vstart: std_logic_vector(8 DOWNTO 0);
@@ -71,11 +87,11 @@ package Common_pkg is    -- untested...
       VXRM:   VXRM;
       VXSAT:  vxsat;
       VCSR:   vcsr;
-      VLB:    VLENB;
     end record crs;
 
 
     type op_category is (
+        NOP_CAT,
         VL_unit_stride, 
         VLS_strided, 
         VLX_indexed, 

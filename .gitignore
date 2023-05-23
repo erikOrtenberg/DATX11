@@ -1,4 +1,5 @@
 hardware/work/
+vpu_v1/
 *.mpf
 *.mti
 *.wlf

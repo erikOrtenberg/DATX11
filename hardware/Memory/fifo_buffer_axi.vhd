@@ -30,7 +30,7 @@ entity fifo_buffer_axi is
     );
 end fifo_buffer_axi;
 
-architecture behavioral of fifo_buffer_axi is
+architecture v1 of fifo_buffer_axi is
 
 subtype buffer_entry is std_logic_vector(bus_width - 1 + 1 + keep_size downto 0);
 
@@ -63,16 +63,18 @@ begin
     process(clk, resetn)
     begin
         if(resetn = '0') then
+            read_pointer <= (others => '0');
+            write_pointer <= (others => '0');
             buf <= (others => (others => '0'));
         elsif (rising_edge(clk)) then
             if(read_tready = '1' and read_tvalid_i = '1')  then
                 read_pointer <= read_pointer + 1; end if;
-            
                 -- conditions to write
             if(write_tvalid = '1' and write_tready_i = '1') then  
                 buf(to_integer(write_pointer(buffer_address - 2 downto 0))) <= i_write;
                 write_pointer <= write_pointer + 1;
             end if;
+
             if (write_tready_i = '1' and write_tvalid = '1' and read_tready = '1' and read_tvalid_i = '1') then
                 read_while_write <= '1';
                 else read_while_write <= '0'; end if;
@@ -105,4 +107,4 @@ begin
         empty when read_pointer = write_pointer
         else other;
 
-end behavioral;
+end v1;

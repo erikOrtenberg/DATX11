@@ -1,0 +1,21 @@
+RegisterMap {
+  MM2S_DMACR = Register(RS=0, Reset=0, Keyhole=0, Cyclic_BD_Enable=0, IOC_IrqEn=0, Dly_IrqEn=0, Err_IrqEn=0, IRQThreshold=1, IRQDelay=0),
+  MM2S_DMASR = Register(Halted=1, Idle=0, SGIncld=0, DMAIntErr=0, DMASlvErr=0, DMADecErr=0, SGIntErr=0, SGSlvErr=0, SGDecErr=0, IOC_Irq=1, Dly_Irq=0, Err_Irq=0, IRQThresholdSts=0, IRQDelaySts=0),
+  MM2S_CURDESC = Register(Current_Descriptor_Pointer=0),
+  MM2S_CURDESC_MSB = Register(Current_Descriptor_Pointer=0),
+  MM2S_TAILDESC = Register(Tail_Descriptor_Pointer=0),
+  MM2S_TAILDESC_MSB = Register(Tail_Descriptor_Pointer=0),
+  MM2S_SA = Register(Source_Address=377798656),
+  MM2S_SA_MSB = Register(Source_Address=0),
+  MM2S_LENGTH = Register(Length=32),
+  SG_CTL = Register(SG_CACHE=0, SG_USER=0),
+  S2MM_DMACR = Register(RS=0, Reset=0, Keyhole=0, Cyclic_BD_Enable=0, IOC_IrqEn=0, Dly_IrqEn=0, Err_IrqEn=0, IRQThreshold=1, IRQDelay=0),
+  S2MM_DMASR = Register(Halted=1, Idle=0, SGIncld=0, DMAIntErr=1, DMASlvErr=0, DMADecErr=0, SGIntErr=0, SGSlvErr=0, SGDecErr=0, IOC_Irq=1, Dly_Irq=0, Err_Irq=1, IRQThresholdSts=0, IRQDelaySts=0),
+  S2MM_CURDESC = Register(Current_Descriptor_Pointer=0),
+  S2MM_CURDESC_MSB = Register(Current_Descriptor_Pointer=0),
+  S2MM_TAILDESC = Register(Tail_Descriptor_Pointer=0),
+  S2MM_TAILDESC_MSB = Register(Tail_Descriptor_Pointer=0),
+  S2MM_DA = Register(Destination_Address=377786368),
+  S2MM_DA_MSB = Register(Destination_Address=0),
+  S2MM_LENGTH = Register(Length=28)
+}
