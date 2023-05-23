@@ -36,9 +36,9 @@ architecture v2 of mem_buf_interface_tb is
     
             --these are towards the memory
             --store
-            read_tkeep          : out std_logic_vector(3 downto 0); --how much to keep
+            read_tkeep          : out std_logic_vector(7 downto 0); --how much to keep
             read_tlast          : out std_logic;   --is this the last in a vector    
-            read_tdata          : out std_logic_vector(31 downto 0);
+            read_tdata          : out std_logic_vector(63 downto 0);
             read_tvalid         : out std_logic;    -- we are not empty (we want to write)
             read_tready         : in std_logic;     -- next is not full (we can write)
     
@@ -51,11 +51,11 @@ architecture v2 of mem_buf_interface_tb is
         );
     end component;
     
-    signal read_tkeep                   : std_logic_vector(3 downto 0); 
+    signal read_tkeep                   : std_logic_vector(7 downto 0); 
     signal write_tkeep                  : std_logic_vector(7 downto 0);
     signal read_tlast, read_tvalid, read_tready     : std_logic;
     signal write_tlast, write_tvalid, write_tready  : std_logic;
-    signal read_tdata                  : std_logic_vector(31 downto 0);
+    signal read_tdata                  : std_logic_vector(63 downto 0);
     signal write_tdata                  : std_logic_vector(63 downto 0);
     signal clk, resetn: STD_LOGIC := '0';
     file vectorFile : text open read_mode is "/home/fredrik/src/DATX11/vectorfile.txt";
@@ -173,14 +173,27 @@ begin
           read(vectorline,c_v(64*i-1 DOWNTO 64*(i-1)));
         end LOOP;
 
+
         a_sig <= a_v;
+        op_code <= "10110100000100010010000001010111";
+        new_ins <= '1';
 
         write_tvalid <= '0';
+        resetn <= '0';
+        wait for 10ns;
         resetn <= '1';
         wait for 10ns;
-        resetn <= '0';
+        wait until rising_edge(clk);
 
-    
+        new_ins <= done;
+        wait on done;
+
+        op_code <= "10110100000100010010000001010111";
+        new_ins <= done;
+        wait on done;
+        wait on done;
+
+
         wait until rising_edge(clk);
         read_tready <= '0';
         resetn<= '1';
@@ -266,9 +279,6 @@ begin
         new_ins <= done;
         wait on done;
 
-        op_code <= "10110100000100010010000001010111";
-        new_ins <= done;
-        wait on done;
         op_code <= "00000000100000000000000000100111";
         new_ins <= done;
         read_tready <= '1';
