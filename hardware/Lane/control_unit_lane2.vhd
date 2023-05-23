@@ -154,11 +154,10 @@ begin
             if new_instr = done_i then
               count_reset <= '0';
               advance <= '1';
-            else
-              if (count_i >= 10000) then
-                  count_reset <= '1';
-                  advance <= '0';
-              end if;
+            end if;
+            if (count_i >= 10000) then
+                count_reset <= '1';
+                advance <= '0';
             end if;
           when OTHERS =>
             if (op_cat = Vl_unit_stride) then 
@@ -187,7 +186,10 @@ begin
             done_i  <= '0';
             count_i <= 0;
         elsif(rising_edge(clk)) then -- FSM, execute the correct number of states
-            if(count_reset = '1') then count_i <= 0; end if;
+            if(count_reset = '1') then 
+                count_i <= 0;
+                done_i <= not done_i;
+            end if;
             prev_state <= state;
             prev_offset <= mem_offset_i;
             if advance = '1' then
@@ -218,13 +220,13 @@ begin
                             mem_offset_i <= "11";
                         when OTHERS => 
                             state <= INSTR;
-                            done_i <= not done_i;
+                            -- done_i <= not done_i;
                             num_ex <= "00001";
                             mem_offset_i <= "00";
                       end CASE;
                     else
                       state <= INSTR;
-                      done_i <= not done_i;
+                      -- done_i <= not done_i;
                       num_ex <= "00001";
                     end if;
                 when OTHERS =>
@@ -233,13 +235,13 @@ begin
                     report "Trying to exit instr phase with single cycli op code" Severity note;
                     state <= EX1;
                     done_cn <= done_cn + 1;
-                    done_i <= not done_i;
+                    -- done_i <= not done_i;
                     num_ex <= num_ex(3 DOWNTO 0) & num_ex(4);
                     op <= op_in;
                   else
                     --report "Trying to return to instr phase with single cycle instruction " Severity note;
                     state <= INSTR;
-                    done_i <= not done_i;
+                    -- done_i <= not done_i;
                     num_ex <= "00001";
                   end if;
                 end case;
