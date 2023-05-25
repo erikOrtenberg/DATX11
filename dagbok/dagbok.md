@@ -61,6 +61,15 @@ Vi jobbade på rapporten. Skrev mycket :) Vi fick äntligen VPUn att syntentiser
 
 ## LV 6
 
+Den här veckan spenderandes mycket tid på att finslipa rapporten efter handledarens kritik. Fredrik och Sofia jobbade även på att fixa timingfel och annat som inte funkade och gjorde det svårt att syntetisera.
+
 ## LV 7
 
 Sofia och Fredrik har arbetat med att arbetat med att få fram resultat. resten av oss har arbetat med att beta av de puknter vi har i rapporten från Mateos feedback.
+
+## LV 8
+
+På måndagen hade vi sista spurten för att göra klart rapporten. Resten av veckan spenderades på diverse andra inlämningar, som bidragsrapport och filminlämning. Efter detta påbörjades förberedelser inför individuell opponering, muntlig opponering och slutredovisningen för nästa vecka.
+
+## Presentationsvecka
+
